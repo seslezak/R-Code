@@ -1,0 +1,22 @@
+#Code for Regularized Discriminant Analysis Using Caret
+
+#Create Model Using a Custom Grid
+library(caret)
+library(mlbench)
+library(klaR)
+data(Sonar)
+set.seed(123)
+inTrain <- createDataPartition(y = Sonar$Class, p = 0.75, list = FALSE)
+training <- Sonar[inTrain, ]
+testing <- Sonar[-inTrain, ]
+ctrl <- trainControl(method = 'repeatedcv', repeats = 3, classProbs = TRUE, summaryFunction = twoClassSummary)
+rdaGrid <- data.frame(gamma = (0:4)/4, lambda = 3/4)
+rdaFit <- train(Class~. , data = training, method = 'rda', tuneGrid = rdaGrid, trControl = ctrl, metric = 'ROC')
+#Note:  model takes some time to run
+rdaFit
+
+# Predict and Create Confusion Matrix
+rdaClasses <- predict(rdaFit, newdata = testing)
+confusionMatrix(rdaClasses, testing$Class)
+
+
