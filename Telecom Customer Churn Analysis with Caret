@@ -1,0 +1,11 @@
+#This example uses a number of different models to assess the data, looking for the best fit.  
+#The example begins with the data already split.
+
+
+
+
+
+#Code from the Presentation:
+#The caret Package: A United Interface for Predictive Models
+#Kuhn, Max
+#February 26, 2014
