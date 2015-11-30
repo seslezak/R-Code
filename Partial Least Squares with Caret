@@ -1,4 +1,4 @@
-#Code for Creating Partial Least Squares Analysis Using Caret
+#Code for Creating Partial Least Squares Analysis then Regularized Discriminant Analysis on the Same Data with Caret
 
 #Create Model and View Results
 library(caret)
@@ -21,6 +21,31 @@ head(plsProbs)
 
 #Create Confusion Matrix
 confusionMatrix(data = plsClasses, testing$Class)
+
+#Additional Code for Regularized Discriminant Analysis Using Caret
+
+#Create Model Using a Custom Grid
+library(klaR)
+set.seed(123)
+rdaGrid <- data.frame(gamma = (0:4)/4, lambda = 3/4)
+rdaFit <- train(Class~. , data = training, method = 'rda', tuneGrid = rdaGrid, trControl = ctrl, metric = 'ROC')
+#Note:  model takes some time to run
+rdaFit
+
+# Predict and Create Confusion Matrix
+rdaClasses <- predict(rdaFit, newdata = testing)
+confusionMatrix(rdaClasses, testing$Class)
+
+#Compare Results of PLS and RDA Models
+resamps <- resamples(list(pls = plsFit, rda = rdaFit))
+summary(resamps)
+
+#Visualize Results
+xyplot(resamps, what = 'BlandAltman')
+
+#Find Differnce Between PLS and RDA Results
+diffs <- diff(resamps)
+summary(diffs)
 
 #Code from
 #"A Short Introduction to the Caret Package"
