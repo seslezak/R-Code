@@ -1,4 +1,4 @@
-#A set of functions to automate some common calls used in ggplot2.
+#A set of functions to automate some common calls used in ggplot2. It is useful to learn how to automate repetitive coding structures.
 
 library(ggplot2)
 
