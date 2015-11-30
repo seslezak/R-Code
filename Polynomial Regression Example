@@ -1,4 +1,5 @@
-#Example for Fitting Polynomial Regression Model for Single Predictive Variable
+#Example for Fitting Polynomial Regression Model for Single Predictive Variable. This is a good example of using a constructor
+#It is also a good example of the cross-validation method knows as "leaving one out."
 
 polyfit <- function(y, x, maxdeg) {
 	pwrs <- powers(x, maxdeg)
