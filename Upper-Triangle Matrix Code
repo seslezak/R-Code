@@ -1,0 +1,68 @@
+#Code for Creating Upper-Triangle Matrices
+
+sum1toi <- function(i) return(i * (i + 1) / 2)
+ut <- function(inmat){
+        n <- nrow(inmat)
+        rtrn <- list()
+        class(rtrn) <- 'ut'
+        rtrn$mat <- vector(length = sum1toi(n))
+        rtrn$ix <- sum1toi(0:(n - 1)) + 1
+        for(i in 1:n) {
+                ixi <- rtrn$ix[i]
+                rtrn$mat[ixi:(ixi + i - 1)] <- inmat[1:i, i]
+        }
+        return(rtrn)
+}
+expandut <- function(utmat) {
+        n <- length(utmat$ix)
+        fullmat <- matrix(nrow = n, ncol = n)
+        for(j in 1:n) {
+                start <- utmat$ix[j]
+                fin <- start + j - 1
+                abovediagj <- utmat$mat[start:fin]
+                fullmat[, j] <- c(abovediagj, rep(0, n - j))
+        }
+        return(fullmat)
+}
+
+print.ut <- function(utmat)
+        print(expandut(utmat))
+
+'%mut%' <- function(utmat1, utmat2) {
+        n <- length(utmat1$ix)
+        utprod <- ut(matrix(0, nrow = n, ncol = n))
+        for(i in 1:n) {
+                startbi <- utmat2$ix[i]
+                prodcoli <- rep(0, i)
+                for(j in 1:i) {
+                        startaj <- utmat1$ix[j]
+                        bielement <- utmat2$mat[startbi + j - 1]
+                        prodcoli[1:j] <- prodcoli[1:j] + bielement * utmat1$mat[startaj:(startaj + j - 1)]
+                }
+                startprodcoli <- sum1toi(i - 1) + 1
+                utprod$mat[startbi:(startbi + i - 1)] <- prodcoli
+        }
+        return(utprod)
+}
+
+test <- function() {
+        utm1 <- ut(rbind(1:2, c(0, 2)))
+        utm2 <- ut(rbind(3:2, c(0, 1)))
+        utp <- utm1 %mut% utm2
+        print(utm1)
+        print(utm2)
+        print(utp)
+        utm1 <- ut(rbind(1:3, 0:2, c(0, 0, 5)))
+        utm2 <- ut(rbind(4:2, 0:2, c(0, 0, 1)))
+        utp <- utm1 %mut% utm2
+        print(utm1)
+        print(utm2)
+        print(utp)
+}
+test()
+
+#Code from Section 9.1.6
+#"Extended Example:  A Class for Storing Upper-Triangle Matrices"
+#Matloff, Norman.  The Art of R Programming.
+#San Francisco: No Starch Press. 2011.
+#ISBN: 978-1-59327-384-2
