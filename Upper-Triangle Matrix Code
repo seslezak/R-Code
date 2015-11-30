@@ -1,4 +1,5 @@
-#Code for Creating Upper-Triangle Matrices
+#Code for Creating Upper-Triangle Matrices.  Another good example of using a constructor function, which creates an object of a
+#particular class.  In this case, the ut() function serves as a constructor.
 
 sum1toi <- function(i) return(i * (i + 1) / 2)
 ut <- function(inmat){
