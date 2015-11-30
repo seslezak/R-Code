@@ -22,3 +22,7 @@ head(plsProbs)
 #Create Confusion Matrix
 confusionMatrix(data = plsClasses, testing$Class)
 
+#Code from
+#"A Short Introduction to the Caret Package"
+#Kuhn, Max
+#August 6, 2015
