@@ -1,4 +1,6 @@
-#Code for Creating Partial Least Squares Analysis then Regularized Discriminant Analysis on the Same Data with Caret.  This is a good example of starting with one basic model then modifying small bits of it to create another model analyzing the same set of data.
+#Code for Creating Partial Least Squares Analysis then Regularized Discriminant Analysis on the Same Data with Caret.  
+#This is a good example of starting with one basic model then modifying small bits of it to create another model analyzing 
+#the same set of data.
 
 #Create Model and View Results
 library(caret)
