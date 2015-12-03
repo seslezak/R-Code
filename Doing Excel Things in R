@@ -1,0 +1,67 @@
+#Here are some things you can do in R that are usually done in Excel.
+#Make sure to view each new object you create to follow the changes you've made.
+
+library(ggplot2)
+library(dplyr)
+library(reshape2)
+diamonds <- data.frame(diamonds)
+
+#View data frame and note column names.
+
+#Rename Columns
+names(diamonds)[8] <- 'length'
+names(diamonds)[9] <- 'width'
+names(diamonds)[10] <- 'depth'
+names(diamonds)[5] <- 'depthperc'
+
+#Create New Column Containing a Function
+diamonds <- mutate(diamonds, cubic = length * width * depth)
+
+#Calculate an Average for Each Column
+colMeans(diamonds[, c(1, 5:11)])
+
+#Summarize the Carat Column
+#First, Create New Column to Clean Data by Rounding
+diamonds$carat2 <- round(diamonds$carat / 0.25) * 0.25
+#Summarize the Diamonds Data Frame
+#Aggregate the Diamonds Data Frame, Take the Mean of Each Numeric Field, and
+#Group by Non-Numeric Fields
+Summary <- aggregate(cbind(depthperc, table, price, length, width, depth, cubic)
+                     ~cut + color + clarity + carat2, data = diamonds, mean)
+
+#Create a Pivot Table
+#For Each Color, Calculate Average Price by Clarity
+pivot_table <- dcast(diamonds[, c('color', 'clarity', 'price')], color ~ clarity, mean)
+
+#Do a VLookup
+#We will merge the diamonds data frame with the Summary data frame.  Both have
+#'price' columns, so rename the Summary price column
+names(Summary)[7] <- 'avgprice'
+#Merge the data sets.
+diamonds <- merge(diamonds, Summary[, c(1:4, 7)], 
+                  by.x = c('cut', 'color', 'clarity', 'carat2'),
+                  by.y = c('cut', 'color', 'clarity', 'carat2'))
+
+#Use Something Like an IF Statement to Create New Column to Categorize by Weight
+diamonds$size[diamonds$carat < 0.5] <- 'Small'
+diamonds$size[diamonds$carat >= 0.5 & diamonds$carat < 1] <- 'Medium'
+diamonds$size[diamonds$carat >= 1] <- 'Large'
+
+#Create a Bar Chart
+barplot(table(diamonds$size), main = 'Distribution by Size', xlab = 'Size', 
+        ylab = 'Number', col = 'red')
+
+#Create a Line Chart
+ggplot(diamonds, aes(clarity)) + geom_freqpoly(aes(group = color, color = color)) +
+        labs(x = 'Clarity', y = 'Number of Diamonds', 'Clarity by Color')
+
+#Create a Scatterplot
+ggplot(diamonds, aes( carat, price, color = clarity)) + geom_point() +
+        labs(x = 'Weight', y = 'Price', title = 'Price by Carat Weight')
+#or use the qplot function
+#qplot(carat, price, data = diamonds, color = clarity, xlab = 'Weight', 
+     #ylab = 'Price', main = 'Price by Carat Weight')
+
+#Code from "How to Transition from Excel to R"
+#Tony Ojeda
+#https://districtdatalabs.silvrback.com/intro-to-r-for-microsoft-excel-users
