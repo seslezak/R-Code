@@ -19,6 +19,7 @@ predictors <- names(churnTrain)[names(churnTrain) != 'churn']
 #inTrainingSet <- createDataPartition(allData$Churn, p = 0.75, list = FALSE)
 #churnTrain <- allData[inTrainingSet, ]
 #churnTest <- allData[-inTrainingSet, ]
+
 #Following Code Works with Original Partition
 
 #Preprocessing the Data to Find Mean and Standard Deviation
