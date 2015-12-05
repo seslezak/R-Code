@@ -57,7 +57,7 @@ gbmTune <- train(churn~. , data = churnTrain,
 #Viewing the Results
 ggplot(gbmTune) + theme(legend.position = 'top')
 
-#Time to Use the Tuned Model for Prediction
+#Using the Tuned Model for Prediction
 gbmPred <- predict(gbmTune, churnTest)
 str(gbmPred)
 gbmProbs <- predict(gbmTune, churnTest, type = 'prob')
@@ -97,6 +97,6 @@ ggplot(fdaTune) + theme(legend.position = 'top')
 
 
 #Code from the Presentation:
-#The caret Package: A United Interface for Predictive Models
+#The Caret Package: A United Interface for Predictive Models
 #Kuhn, Max
 #February 26, 2014
