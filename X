@@ -1,0 +1,92 @@
+#This is another set of code to help make the transition from Excel to R
+
+#Open data file and view data.
+earnings <- read.csv('C:\\Users\\Steven\\Desktop\\Employee_Earnings_Report_2014.csv', stringsAsFactors = FALSE)
+dim(earnings)
+head(earnings)
+tail(earnings)
+
+#Examine data structure; all characters, that will have to change
+str(earnings)
+
+#Focus on specific rows, columns, or cells
+earnings[3, 1] #row 3, column 1 or
+#earnings$NAME[3]
+earnings[, 1] #column 1 or
+#earnings$NAME
+earnings[3, ] #row 3
+
+#Change column format (in this case, remove dollar sign from TOTAL.EARNINGS column)
+earnings$TOTAL.EARNINGS <- gsub('\\$', '', earnings$TOTAL.EARNINGS)
+#Convert character vector to numeric vector
+earnings$TOTAL.EARNINGS <- as.numeric(earnings$TOTAL.EARNINGS)
+
+#Sort by a particular column (negative sign denotes descending order )
+earnings <- earnings[order(-earnings$TOTAL.EARNINGS), ]
+
+#Create a column with a formula (in this case, convert character to numeric first)
+earnings$OVERTIME <- gsub('\\$', '', earnings$OVERTIME)
+earnings$OVERTIME <- as.numeric(earnings$OVERTIME)
+earnings$Total.less.OT <- earnings$TOTAL.EARNINGS - earnings$OVERTIME
+
+#Filter a column and create new object
+fire_dept <- subset(earnings, DEPARTMENT.NAME == 'Boston Fire Department')
+police_dept <- subset(earnings, DEPARTMENT.NAME == 'Boston Police Department')
+
+#Perform calculations on columns
+earnings_total <- sum(earnings$TOTAL.EARNINGS)
+earnings_avg <- mean(earnings$TOTAL.EARNINGS)
+earnings_med <- median(earnings$TOTAL.EARNINGS)
+
+#Break Names into Last, First, Middle (creates new column for each)
+#Start with Last Names
+earnings$Last.Name <- sub(',.*', '', earnings$NAME) #deletes everything in NAME
+        #column after the comma
+#Next is First Name
+earnings$First.Name <- sub('.*,', '', earnings$NAME)
+
+#End with Middle Name, Pt 1 (create array of all lines)
+earnings_list <- 1:nrow(earnings)
+#Middle Name, Pt 2 (clean up First.Name column using a loop; create Mid.Name column)
+for(i in earnings_list){
+        if (grepl(' ', earnings$First.Name[i])) {
+                earnings$Mid.Name[i] <- sub('.* ', '', earnings$First.Name[i])
+        } else {
+                earnings$Mid.Name[i] <- ''
+        }
+}
+#Clean up First Name column
+earnings$First.Name <- sub(' .*', '', earnings$First.Name)
+
+#Create Pivot Table to Count Employees in Each Department
+#First, create new data frame
+Dept_Workers <- data.frame(table(earnings$DEPARTMENT.NAME))
+#Then sort
+Dept_Workers <- Dept_Workers[order(-Dept_Workers$Freq), ]
+#Next, rename columns
+colnames(Dept_Workers) <- c('Dept', 'Employees')
+#Now, Create Pivot Table of Total Income for Employees in Each Department
+income <- tapply(earnings$TOTAL.EARNINGS, earnings$DEPARTMENT.NAME, sum)
+income <- data.frame(income)
+income$Dept <- rownames(income)
+#Merge income data frame with Dept_Workers data frame
+merged <- merge(Dept_Workers, income, by = 'Dept') #Note we created a 'Dept'
+        #column in each data frame for this purpose
+#Determine Income per Employee per Department
+merged$income.per.employee <- merged$income / merged$Employees
+#Sort by income per employee
+mergedPer <- merged[order(-merged$income.per.employee), ]
+#Sort by income
+merged <- merged[order(-merged$income), ]
+head(merged)
+
+#Save merged files as csv
+write.csv(merged, 'C:\\Users\\Steven\\Desktop\\merged.csv' )
+write.csv(mergedPer, 'C:\\Users\\Steven\\Desktop\\mergedPer.csv' )
+
+
+#Code Adapted From:
+#"R for Beginners: How to Transition from Excel to R"
+#Tran, Andrew Ba
+#TrendCT
+#http://trendct.org/2015/06/12/r-for-beginners-how-to-transition-from-excel-to-r/
