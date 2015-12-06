@@ -1,7 +1,7 @@
 #This is another set of code to help make the transition from Excel to R
 
 #Open data file and view data.
-earnings <- read.csv('C:\\Users\\Steven\\Desktop\\Employee_Earnings_Report_2014.csv', stringsAsFactors = FALSE)
+earnings <- read.csv('C:\\(Path)\\Employee_Earnings_Report_2014.csv', stringsAsFactors = FALSE)
 dim(earnings)
 head(earnings)
 tail(earnings)
@@ -29,7 +29,7 @@ earnings$OVERTIME <- gsub('\\$', '', earnings$OVERTIME)
 earnings$OVERTIME <- as.numeric(earnings$OVERTIME)
 earnings$Total.less.OT <- earnings$TOTAL.EARNINGS - earnings$OVERTIME
 
-#Filter a column and create new object
+#Filter a column and create new objects
 fire_dept <- subset(earnings, DEPARTMENT.NAME == 'Boston Fire Department')
 police_dept <- subset(earnings, DEPARTMENT.NAME == 'Boston Police Department')
 
@@ -81,9 +81,8 @@ merged <- merged[order(-merged$income), ]
 head(merged)
 
 #Save merged files as csv
-write.csv(merged, 'C:\\Users\\Steven\\Desktop\\merged.csv' )
-write.csv(mergedPer, 'C:\\Users\\Steven\\Desktop\\mergedPer.csv' )
-
+write.csv(merged, 'C:\\(Path)\\merged.csv' )
+write.csv(mergedPer, 'C:\\(Path)\\mergedPer.csv' )
 
 #Code Adapted From:
 #"R for Beginners: How to Transition from Excel to R"
