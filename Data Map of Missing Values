@@ -1,0 +1,27 @@
+#This first code illustrates how to create a simple graphic representation of a dataset, showing which data are missing.
+
+library(dplyr)
+library(wakefield)
+library(Amelia)
+df <- r_data_frame(n = 100, id, race, age, sex, hour, iq, height, died, Scoring = rnorm, Smoker = valid) %>% r_na(prob = 0.33)
+missmap(df)
+
+#The second code was developed by Nicholas Tierney to improve the quality of the graphic using ggplot2.
+#It builds on the df object created above.
+
+library(reshape2)
+library(ggplot2)
+ggplot_missing <- function(x){
+        x %>% is.na %>% melt %>% ggplot(data = ., aes(x = Var2, y = Var1)) +
+                geom_raster(aes(fill = value)) +
+                scale_fill_grey (name = '', labels = c('Present', 'Missing')) +
+                theme_minimal() +
+                theme(axis.text.x = element_text(angle = 45, vjust = 0.5)) +
+                labs(x = 'Variables on Dataset', y = 'Rows / Observations')
+}
+ggplot_missing(df)
+
+#Code from:
+#"ggplot your missing data"
+#Tierney, Nicholas
+#http://www.njtierney.com/r/missing%20data/rbloggers/2015/12/01/ggplot-missing-data/
