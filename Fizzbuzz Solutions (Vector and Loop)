@@ -1,0 +1,20 @@
+#Two Solutions for the Fizzbuzz Puzzle in R
+
+#First, by vectorizing
+
+m <- 1:100
+m[which(m%%3 == 0)][which(m%%5 == 0)] <- 'fizzbuzz'
+m[which(as.numeric(m)%%3 == 0)] <- 'fizz'
+m[which(as.numeric(m)%%5 == 0)] <- 'buzz'
+print(m)
+
+#Second, by looping
+
+for (i in 1:100){
+        if (i%%3==0) if (i%%5==0) print("fizzbuzz") else print("fizz") else
+                if (i%%5==0) print("buzz") else
+                        print(i)
+}
+
+#Code from librestats
+#http://librestats.com/2012/01/10/honing-your-r-skills-for-job-interviews/
