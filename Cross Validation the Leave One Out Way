@@ -1,0 +1,26 @@
+#This code uses the leave one out method to cross-validate a Generalized Linear Model.
+#It uses two models -- one employing a gamma distribution, the other a poisson distribution
+#and calculates a test set of data for each.
+
+pkgs <- c('doParallel', 'foreach')
+lapply(pkgs, require, character.only = TRUE)
+registerDoParallel(cores = 8)
+data(AutoCollision, package = 'insuranceData')
+model1 <- glm(Severity ~ Age + Vehicle_Use, data = AutoCollision, family = Gamma(link = 'log'))
+model2 <- glm(Claim_Count ~ Age + Vehicle_Use, data = AutoCollision, family = poisson(link = 'log'))
+loo_predict <- function(obj) {
+        yhat <- foreach(i = 1:nrow(obj$data), .combine = rbind) %dopar% {
+                predict(update(obj, data = obj$data[-i, ]), type = 'response')
+        }
+        return(data.frame(result = yhat[, 1], row.names = NULL))
+}
+test1 <- loo_predict(model1)
+test1$result
+test2 <- loo_predict(model2)
+test2$result
+
+#Code from:
+#Yet Another Blog in Statistical Computing
+#"Calculate Leave-One-Out Prediction for GLM"
+#13 December 2015
+#https://statcompute.wordpress.com/2015/12/13/calculate-leave-one-out-prediction-for-glm/
