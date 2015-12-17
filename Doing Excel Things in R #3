@@ -1,0 +1,102 @@
+#This Code Shows How to Do Excel Things in R
+
+#First, add rows and columns.
+
+iris.num <- iris[, -5]
+colSums(iris.num)
+colMeans(iris.num)
+
+#Find minimum and maximum values, two different ways
+
+apply(iris.num, 2, min) #or
+sapply(iris.num, min)
+apply(iris.num, 2, max) #or
+sapply(iris.num, max)
+
+#Formatting
+
+format(12345678.9, digits = 9, decimal.mark = '.', big.mark = ',', small.mark = ',', small.interval = 3)
+
+x <- colMeans(mtcars[, 1:4])
+format(x, digits = 2, nsmall = 2)
+
+x <- seq(0.5, 0.55, 0.01)
+sprintf('%.1f%%', 100 * x)
+
+set.seed(1)
+x <- 1000 * runif(5)
+sprintf('$%3.2f', x)
+
+stuff <- c('bread', 'cheese')
+prices <- c(2.1, 4)
+sprintf('%s costs $%3.2f', stuff, prices)
+
+#How to Sort
+
+with(mtcars, mtcars[order(hp), ])
+with(mtcars, mtcars[order(hp, decreasing = TRUE), ])
+
+#Using IF Statements
+
+mtcars <- within(mtcars, mpgClass <- ifelse(mpg < mean(mpg), 'Low', 'High'))
+mtcars
+mtcars[mtcars$mpgClass == 'High', ]
+mtcars[mtcars$mpgClass != 'High', ] #or
+mtcars[mtcars$mpgClass == 'Low', ]
+
+#Using Conditionals
+
+with(mtcars, mean(mpg))
+with(mtcars, mean(mpg[hp < 150]))
+with(mtcars, mean(mpg[hp <= 150]))
+with(mtcars, mean(mpg[hp > 150]))
+with(mtcars, mean(mpg[hp >= 150]))
+with(mtcars, length(mpg[hp >= 150]))
+
+#Transposing Columns and Rows
+
+x <- matrix (1:24, ncol = 4)
+x
+t(x)
+t(t(x))
+mtcars[1:4, ]
+t(mtcars[1:4, ])
+
+#Identify Unique and Duplicated Values
+
+unique(mtcars$cyl)
+dupes <- duplicated(iris)
+head(dupes)
+which(dupes)
+iris[dupes, ]
+iris[!dupes, ]
+nrow(iris[!dupes, ])
+
+#Use Lookups
+
+index <- match('Toyota Corolla', rownames(mtcars))
+index
+mtcars[index, 1:4]
+
+#Use Pivot Tables
+
+with(mtcars, tapply(hp, list(cyl, gear), mean))
+aggregate( hp ~ cyl + gear + am, mtcars, mean)
+
+#Create R Function to Do Excel Goal Seek and Solver Work
+
+sales <- function(price) {
+        100 - 0.5 * price #a linear function
+}
+revenues <- function(price) {
+        price * sales(price) #a non-linear function
+}
+par(mfrow = c(1, 2))
+curve(sales, from = 50, to = 150, xname = 'Price', ylab = 'Sales', main = 'Sales')
+curve(revenues, from = 50, to = 150, xname = 'Price', ylab = 'Revenues', main = 'Revenues')
+par(mfrow = c(1, 1))
+optimize(revenues, interval = c(50, 150), maximum = TRUE)
+    
+#Code Adapted From:
+#Chapter 19: Ten Things You Can Do in R That You Would've Done in MS Excel
+#R for Dummies
