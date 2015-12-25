@@ -1,0 +1,24 @@
+#This code uses a decision tree approach to predict birth weights for infants.
+
+library(MASS)
+library(rpart)
+head(birthwt)
+hist(birthwt$bwt)
+table(birthwt$low)
+cols <- c('low', 'race', 'smoke', 'ht', 'ui')
+birthwt[cols] <- lapply(birthwt[cols], as.factor)
+set.seed(1)
+train <- sample(1:nrow(birthwt), 0.75 * nrow(birthwt))
+birthwtTree <- rpart(low ~ . - bwt, data = birthwt[train, ], method = 'class')
+plot(birthwtTree)
+text(birthwtTree, pretty = 0)
+summary(birthwtTree)
+birthwtPred <- predict(birthwtTree, birthwt[-train, ], type = 'class')
+table(birthwtPred, birthwt[-train, ]$low)
+confusionMatrix(birthwtPred, birthwt[-train, ]$low)
+
+#Code Adapted From:
+#Kodali, Teja
+#"Using Decision Trees to Predict Infant Birth Rates"
+#datascience+
+#http://datascienceplus.com/using-decision-trees-to-predict-infant-birth-weights/
