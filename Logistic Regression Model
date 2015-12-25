@@ -1,0 +1,77 @@
+#This code creates a logistics regression model using no packaged functions. I could
+#not get one line to work, so it is preceded by a hash-mark in the code. Leaving
+#the line out doesn't seem to make a difference.
+
+calculate.d1 <- function(y, x, pi) {
+        d1 <- y * x - pi * x
+        d1_sum <- sum(d1)
+        return(d1_sum)
+}
+
+calculate.11 <- function(y, pi){
+        ll <- 1
+        ll_unit <- 1:length(y)
+        for (i in 1:length(y)){
+                ll_unit[i] <- ifelse(y[i] == 1, pi[i], 1 - pi[i])
+                ll <- ll_unit[i] * ll
+        }
+        return(ll)
+}
+
+find.pi <- function(x_new, beta){
+        pi <- 1:nrow(x_new)
+        expon <- 1:nrow(x_new)
+        for (i in 1:nrow(x_new)){
+                expon[i] <- 0
+                for (j in 1:ncol(x_new)){
+                       expo <- x_new[i, j] * beta[j]
+                       expon[i] <- expo + expon[i] 
+                }
+                pi[i] <- exp(expon[i]) / (1 + exp(expon[i]))
+        }
+        return(pi)
+}
+
+findW <- function(pi){
+        W <- matrix(0, length(pi), length(pi))
+        for (i in 1:length(pi)){
+                W[i, i] <- pi [i] * (1 - pi[i])
+        }
+        return(W)
+}
+
+logistic <- function(x, y, vars, obs, learningrate, dif){
+        beta <- rep(0, (vars + 1))
+        bias <- rep(1, obs)
+        x_new <- cbind(bias, x)
+        derivative <- 1:(vars + 1)
+        diff <- 10000
+        while(diff > dif){
+                pi <- find.pi(x_new, beta)
+                pi <- as.vector(pi)
+                W <- findW(pi)
+                derivative <- (solve(t(x_new) %*% W %*% as.matrix(x_new))) %*% (t(x_new) %*% (y - pi))
+                beta <- beta + derivative
+                diff <- sum(derivative^2)
+                ll <- calculate.11(y, pi)
+                print(ll)
+        }
+        return(beta)
+}
+
+x <- 1:10
+y <- c(rep(0, 4), 1, 0, 1, 0, 1, 1)
+a <- logistic(x, y, 1, 10, 0.01, 0.000000001)
+#calculate.11(y, find.pi(x_new, a))
+data <- cbind(x, y)
+data <- as.data.frame(data)
+mylogit <- glm(y ~ x, data = data, family = 'binomial')
+mylogit
+preds <- predict(mylogit, newdata = data, type = 'response')
+calculate.11(data$y, preds)
+
+#Code Adapted From:
+#"Building a Logistic Regression Model from Scratch"
+#Srivastava, Tavish
+#Analytics Vidhya
+#http://www.analyticsvidhya.com/blog/2015/10/basics-logistic-regression/
