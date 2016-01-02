@@ -1,0 +1,21 @@
+#This code shows two ways to create a basic pie chart in R.
+
+#The first is fully automated.
+
+pie(table(iris$Species))
+
+#The second is more customized with labels and legends.
+
+vec <- iris$Species
+vec_data <- data.frame(table(vec))
+cols <- c('white', 'blue', 'red')
+percentlabel <- round(100 * vec_data$Freq / sum(vec_data$Freq), 2)
+pielabel <- paste(percentlabel, '%', sep = '')
+pie(vec_data$Freq, labels = pielabel, col = cols, main = 'Pie Chart')
+legend('topleft', c('setosa', 'versicolor', 'virginica'), fill = cols, cex = 0.8)
+
+#Though there are many similar sources for this code on the web,
+#this particular code was adapted from:
+#"Create Pie Charts in R"
+#Analytics Vidhya
+#http://discuss.analyticsvidhya.com/t/create-pie-charts-in-r/1497
