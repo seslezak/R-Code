@@ -1,0 +1,272 @@
+#Doing Excel Things in R #4
+
+#We are going to examine some data from a petroleum refinery in R using the 
+#petrol data file from the MASS package. This is basically an exercise in 
+#descriptive statistics.
+
+#First, load the MASS package.
+
+library(MASS)
+
+#It helps to have a visual of the structure and headings of the data.
+
+str(petrol)
+head(petrol)
+
+#For purposes of understanding what we are doing with the data, the different
+#columns refer to:
+        
+#1. SG = specific gravity in degrees API
+#2. VP = vapor pressure (psi)
+#3. V10 = volatility of crude oil, ASTM 10% point
+#4. EP = desired volatility of gasoline
+#5. Y = yield as percentage of crude
+
+#We can find the mean of each column one at a time:
+        
+mean(petrol$SG)
+mean(petrol$VP)
+mean(petrol$V10)
+mean(petrol$EP)
+mean(petrol$Y)
+
+#Can we find all column means more simply? Yes. But we can't use the colMeans
+#command [colMeans(petrol, na.rm = FALSE, dims = 1)] because our petrol data 
+#have a non-numeric column, No (see the head() command above).
+
+#So we have to remove the non-numeric column.  When we do, the colMeans() 
+#command works just fine.
+
+petrol$No <- NULL
+colMeans(petrol, na.rm = FALSE, dims = 1)
+
+#Another way would be to use the *apply* command.
+
+apply(petrol[, c('SG','VP', 'V10', 'EP', 'Y')], 2, mean)
+
+#Finding the mode is not as simple in R. In R, the mode() command refers to the 
+#storage mode of the object.
+
+mode(petrol$SG)
+
+#Not what we want, so we have to back our way into it.
+
+#First, create an object and then assign a table to it.
+
+modeSG <- table(petrol$SG)
+modeSG
+
+#Looking at the output, we can see which value appears the most. But we can use 
+#R to find the maximum value in the table. That's the mode we are looking for.
+
+max(modeSG)
+
+#Here, we see the value 32.2 shows up five times in the SG column, so that is 
+#our mode.
+
+#We can do that again to find modes one by one.
+
+modeVP <- table(petrol$VP)
+modeVP
+max(modeVP)
+modeV10 <- table(petrol$V10)
+modeV10
+max(modeV10)
+modeEP <- table(petrol$EP)
+modeEP
+max(modeEP)
+modeY <- table(petrol$Y)
+modeY
+max(modeY)
+
+#You get the idea...
+
+#Likewise, we can find the median value for each column, one by one.
+
+median(petrol$SG)
+median(petrol$VP)
+median(petrol$V10)
+median(petrol$EP)
+median(petrol$Y)
+
+#Or we can use the apply() command to find them all at once.
+
+apply(petrol[, c('SG','VP', 'V10', 'EP', 'Y')], 2, median)
+
+#It really is a matter of personal taste. My son says the way you code shows 
+#your "coding accent."  Every coder has a different accent. One way isn't better
+#than another, just different.
+
+#Let's find the range of our data. First, the one-at-a-time method.
+
+range(petrol$SG)
+
+#Or we can use the apply() command.
+
+apply(petrol[, c('SG','VP', 'V10', 'EP', 'Y')], 2, range)
+
+#We can find the standard deviations using the sd() and apply() commands.
+
+sd(petrol$SG)
+apply(petrol[, c('SG','VP', 'V10', 'EP', 'Y')], 2, sd)
+
+#We can calculate the variance in different ways, as well. Square the sd() 
+#command or just use the var() command.
+
+sd(petrol$SG)^2
+var(petrol$SG)
+
+#Enough data. Let's try some graphs.
+
+#We can draw boxplots for data summaries.  This is pretty easy in R. Here is the
+#basic version. Boxplots show the minimum, first quartile, median, third quartile, 
+#and maximum values, with any outliers.
+
+boxplot(petrol$EP)
+
+#It shows the median is 349, which we saw earlier, and the range from 205 to 444.
+
+#We can jazz the boxplot up a bit, adding color and labels.
+
+boxplot(petrol$EP, ylab = 'EP', col = 'blue')
+
+#Another useful graph for descriptive statistics is the histogram. First, we 
+#build a basic histogram of EP values.
+
+hist(petrol$EP)
+
+#It might be helpful to add labels and color. We can also define the number of 
+#bins and start the x-axis at the origin (zero) to get a better picture of the 
+#distribution of values. Try using different values for breaks. I used 10, 15, 
+#and 20 and settled on 15.
+
+hist(petrol$EP, xlab = 'Desired Volatility of Gasoline', col = 'red', breaks = 15, main = 'Gas Volatility', xlim = c(0,500))
+
+#So far, we have been interested in describing the statistics. But we use R 
+#(and Excel) to identify relationships between variables.
+
+#Here is a neat graphic I haven't seen in Excel.
+
+plot(petrol)
+
+#What we have done here is plot each variable in the petrol file against every 
+#other variable. Remember, we removed the No column earlier from the file so 
+#it does not appear in these graphs. 
+
+#If the No column were still in the petrol data, we could have done the same 
+#thing with this command:  plot(petrol[, 2:6]).
+
+#Now we can begin to ask about relationships within the data.
+
+#By examining the plots, it looks like there might be some kind of relationship 
+#between VP and V10. There might also be something going on between EP and Y.
+
+#One way to test this quickly is to look for correlations. We all know 
+#"Correlation is not causation" but it can still be helpful in identifying 
+#possible relationships.
+
+#Let's look for the correlation between VP and V10.
+
+cor.test(petrol$VP, petrol$V10, method = 'pearson')
+
+#We can see the order of the variables doesn't matter with correlations. 
+#That is, we don't need to know which variable is dependent (the y-variable) and
+#which one is independent (the x-variable) at this point. It will matter later, 
+#though, when we are trying to find a function for the variables.
+
+cor.test(petrol$V10, petrol$VP, method = 'pearson')
+
+#In both cases, the correlation is -0.906, which is pretty good.
+
+#Now for the correlation between Y and EP.
+
+cor.test(petrol$EP, petrol$Y, method = 'pearson')
+
+#The correlation here is 0.712.  So our intuitive sense was proven correct.
+
+#We could make life easier for ourselves if we were just to create a correlation 
+#table, which shows the correlations between all the variables.  Remember, any 
+#variable correlated to itself has a correlation of 1.
+
+#We need to load the *corrplot* package to create the table graphically, but we 
+#can do a basic table in R easily enough. Pay attention to how the table is 
+#structured.
+
+library(corrplot)
+M <- cor(petrol)
+M
+
+#The graphic representation is more interesting and resembles a heat map.
+
+corrplot(M, method = 'number')
+
+#The *corrplot* command contains numerous methods for representing correlation 
+#values, so explore them on your own to see which suits your needs best.
+
+#If we use a rule that we are interested in correlation values between 0.60 
+#and 1 or between -0.60 and -1 we can see there are relationships of interest 
+#between the following pairs:  VP and SG; V10 and SG; V10 and VP; and Y and EP.
+
+#Let's make simple linear regression models between these variables to define 
+#functions that describe the relationship between the data.  Now, we need to 
+#determine which variable in the pair is independent (x-variable) and which 
+#variable is dependent (y-variable).
+
+#I am not a petroleum engineer, but I am guessing that pressure depends on 
+#volatility.  If I am wrong about this, please let me know and I will fix this. 
+#But for illustrative purposes only, here is how to create linear models in R 
+#using the lm() command.
+
+regV10.VP <- lm(VP ~ V10, data = petrol)
+regV10.VP
+
+#So the equation for VP would be VP = -0.06324(V10) + 19.45396 where V10 is the 
+#x-variable and VP is the y-variable.
+
+#We can create a plot of the data with our linear function included.
+
+#First, we plot VP against V10. We have to define the length of the x- and 
+#y-axes to make this work. We add the regression line using the abline() command.
+
+plot(petrol$V10, petrol$VP, xlim = c(0, 320), ylim = c(0, 20), xlab = 'V10-Crude Volatility', ylab = ' VP-Vapor Pressure', main = 'Vapor vs. Volatility')
+abline(regV10.VP)
+
+#We can do the same linear regression for each variable pair, matching them 
+#one-to-one. Remember, you can use the graphic from the plot(petrol) command 
+#above to determine the appropriate limits for the x- and y-axes.
+
+regSG.VP <- lm(VP ~ SG, data = petrol)
+regSG.VP
+plot(petrol$SG, petrol$VP, xlim = c(0, 60), ylim = c(-10, 10), xlab = 'SG-Specific Gravity', ylab = ' VP-Vapor Pressure', main = 'Pressure vs Gravity')
+abline(regSG.VP)
+
+regSG.V10 <- lm(V10 ~ SG, data = petrol)
+regSG.V10
+plot(petrol$SG, petrol$V10, xlim = c(0, 60), ylim = c(0, 430), xlab = 'SG-Specific Gravity', ylab = 'V10-Crude Volatility', main = 'Volatility vs Gravity')
+abline(regSG.V10)
+
+regEP.Y <- lm(Y ~ EP, data = petrol)
+regEP.Y
+plot(petrol$EP, petrol$Y, xlim = c(0, 450), ylim = c(-20, 50), xlab = 'EP-Volatility of Gas', ylab = 'Y-Yield', main = 'Yield vs Gas Volatility')
+abline(regEP.Y)
+
+#It's not necessary for us to examine each variable by only one variable at a 
+#time. We can use multivariate regression to test a single variable against the 
+#other.  
+
+#There are methods to determine which variables are the most important to include 
+#in the multivariate regression model, but we won't bother with that right now.  
+#We are just interested in creating a multivariate model. 
+
+#There are different ways of doing this in R, but we will use the glm() command.
+#GLM stands for Generalized Linear Model.
+
+m.reg.model <- glm(Y ~ SG + VP + V10 + EP, data = petrol, family = gaussian)
+m.reg.model
+
+#Our equation is Yield = 0.227(SG) + 0.554(VP) -0.15(V10) + 0.155(EP) - 6.821. 
+#We can use the summary() command to learn more about our analysis.
+
+summary(m.reg.model)
+
+#This may be more information than you needed.
