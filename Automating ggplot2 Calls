@@ -26,7 +26,7 @@ viz_func(mydat, 'date', 'value3') +
 
 viz_func2 <- function(data, x){
         ggplot(data, aes_string(x=x)) +
-                geom_histogram() +
+                geom_histogram(binwidth = 0.075) +
                 ggtitle("Insert Title Here") +
                 xlab("Date") + ylab("Value") + ylim(0,5) + 
                 theme(axis.text.x=element_text(colour="black")) +
