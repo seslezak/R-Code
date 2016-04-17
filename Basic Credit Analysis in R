@@ -1,0 +1,94 @@
+url <- 'https://onlinecourses.science.psu.edu/stat857/sites/onlinecourses.science.psu.edu.stat857/files/german_credit.csv'
+credit <- read.csv(url, header = TRUE, sep = ',')
+credit$No.of.Credits.at.this.Bank[credit$No.of.Credits.at.this.Bank == 4] <- 3
+str(credit)
+S <- c(1, 2, 4, 5, 7, 8, 9, 10, 11, 12, 13, 15, 16, 17, 18, 19, 20)
+for(i in S) credit[, i] <- as.factor(credit[, i])
+
+#Method One:  Logistic Regression
+
+i_test1 <- sample(1:nrow(credit), size = 333)
+i_calibration1 <- (1:nrow(credit))[-i_test1]
+set.seed(1)
+LogisticModel.1 <- glm(Creditability ~ Account.Balance + Payment.Status.of.Previous.Credit + Purpose + Length.of.current.employment + Sex...Marital.Status, family = binomial, data = credit[i_calibration1, ])
+fitLog1 <- predict(LogisticModel.1, type = 'response', newdata = credit[i_test1, ])
+library(ROCR)
+pred1 <- prediction(fitLog1, credit$Creditability[i_test1])
+perf1 <- performance(pred1, 'tpr', 'fpr')
+plot(perf1)
+AUCLog1 <- performance(pred1, measure = 'auc')@y.values[[1]]
+AUCLog1
+
+#Method Two: An Alternative Logistic Model
+
+set.seed(1)
+LogisticModel.2 <- glm(Creditability ~ ., family = binomial, data = credit[i_calibration1, ])
+fitLog2 <- predict(LogisticModel.2, type = 'response', newdata = credit[i_test1, ])
+pred2 <- prediction(fitLog2, credit$Creditability[i_test1])
+perf2 <- performance(pred2, 'tpr', 'fpr')
+plot(perf2)
+AUCLog2 <- performance(pred2, measure = 'auc')@y.values[[1]]
+AUCLog2
+
+#Method Three: Regression Tree
+
+library(rpart)
+set.seed(1)
+TreeModel <- rpart(Creditability ~ ., data = credit[i_calibration1, ])
+library(rpart.plot)
+prp(TreeModel, type = 2, extra = 1)
+fitTree <- predict(TreeModel, newdata = credit[i_test1, ], type = 'prob')[, 2]
+pred3 <- prediction(fitTree, credit$Creditability[i_test1])
+perf3 <- performance(pred3, 'tpr', 'fpr')
+plot(perf3)
+AUCTree <- performance(pred3, measure = 'auc')@y.values[[1]]
+AUCTree
+
+#Method Four: Random Forest
+
+library(randomForest)
+set.seed(1)
+RF <- randomForest(Creditability ~ ., data = credit[i_calibration1, ])
+fitForest1 <- predict(RF, newdata = credit[i_test1, ], type = 'prob')[, 2]
+pred4 <- prediction(fitForest1, credit$Creditability[i_test1])
+perf4 <- performance(pred4, 'tpr', 'fpr')
+plot(perf4)
+AUCRF <- performance(pred4, measure = 'auc')@y.values[[1]]
+AUCRF
+
+#Method Five: Comparing Random Forests with Logistic Models
+
+AUC <- function(i){
+        set.seed(i)
+        i_test2 <- sample(1:nrow(credit), size = 333)
+        i_calibration2 <- (1:nrow(credit))[-i_test2]
+        LogisticModel.3 <- glm(Creditability ~ ., family = binomial, data = credit[i_calibration2, ])
+        summary(LogisticModel.3)
+        fitLog3 <- predict(LogisticModel.3, type = 'response', newdata = credit[i_test2, ])
+        library(ROCR)
+        pred5 <- prediction(fitLog3, credit$Creditability[i_test2])
+        AUCLog3 <- performance(pred5, measure = 'auc')@y.values[[1]]
+        RF <- randomForest(Creditability ~ ., data = credit[i_calibration2, ])
+        fitForest2 <- predict(RF, newdata = credit[i_test2, ], type = 'prob')[, 2]
+        pred6 <- prediction(fitForest2, credit$Creditability[i_test2])
+        AUCRF <- performance(pred6, measure = 'auc')@y.values[[1]]
+        return(c(AUCLog3, AUCRF))
+}
+
+VAUC <- Vectorize(AUC)(1:400)
+plot(t(VAUC), xlab = 'Logistic', ylab = 'Random Forest')
+
+AA <- as.data.frame(t(VAUC))
+library(ggplot2)
+data(AA, package = 'MASS')
+ggplot(AA, aes(x = V1, y = V2)) + geom_point() + geom_density2d() + xlab('Logistic') + ylab('Random Forest')
+
+library(hdrcde)
+par(mar = c(3.1, 4.1, 1.1, 2.1))
+with(AA, hdr.boxplot.2d(V1, V2, show.points = TRUE, prob = c(.01, .05, .5, .75), xlab = 'Logistic', ylab = 'Random Forest'))
+
+Unless we charge a lot of interest to cover our losses, we might need better models.
+
+
+
+The code in this example was adapted from Arthur Charpentier at the Freakonometrics blog in the post, [*Classification on the German Credit Database*.](http://freakonometrics.hypotheses.org//48285)
