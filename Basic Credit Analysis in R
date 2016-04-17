@@ -86,9 +86,3 @@ ggplot(AA, aes(x = V1, y = V2)) + geom_point() + geom_density2d() + xlab('Logist
 library(hdrcde)
 par(mar = c(3.1, 4.1, 1.1, 2.1))
 with(AA, hdr.boxplot.2d(V1, V2, show.points = TRUE, prob = c(.01, .05, .5, .75), xlab = 'Logistic', ylab = 'Random Forest'))
-
-Unless we charge a lot of interest to cover our losses, we might need better models.
-
-
-
-The code in this example was adapted from Arthur Charpentier at the Freakonometrics blog in the post, [*Classification on the German Credit Database*.](http://freakonometrics.hypotheses.org//48285)
