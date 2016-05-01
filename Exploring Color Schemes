@@ -1,0 +1,23 @@
+library(ggplot2)
+
+ggplot(diamonds, aes(carat, price)) + geom_point(aes(color = cut)) + scale_color_brewer(type = 'div', palette = 4, direction = 1) + xlab('Carats') + ylab('Price') + ggtitle('Diamonds')
+
+ggplot(diamonds, aes(carat, price, color = cut)) + geom_point() + scale_color_brewer(type = 'div', palette = 4, direction = -1) + xlab('Carats') + ylab('Price') + ggtitle('Diamonds')
+
+ggplot(diamonds, aes(carat, price, color = cut)) + geom_point() + scale_color_brewer(type = 'div', palette = 'PRGn', direction = 1) + xlab('Carats') + ylab('Price') + ggtitle('Diamonds')
+
+ggplot(diamonds, aes(carat, price, color = cut)) + geom_point() + scale_color_brewer(type = 'div', palette = 'Greens', direction = 1) + xlab('Carats') + ylab('Price') + ggtitle('Diamonds')
+
+ggplot(diamonds, aes(carat, price, color = cut)) + geom_point() + scale_color_brewer(type = 'div', palette = 'Reds', direction = 1) + xlab('Carats') + ylab('Price') + ggtitle('Diamonds')
+
+ggplot(diamonds, aes(carat, price, color = cut)) + geom_point() + scale_color_brewer(type = 'div', palette = 'Blues', direction = 1) + xlab('Carats') + ylab('Price') + ggtitle('Diamonds')
+
+ggplot(diamonds, aes(carat, price, color = cut)) + geom_point() + scale_color_brewer(type = 'div', palette = 'Oranges', direction = 1) + xlab('Carats') + ylab('Price') + ggtitle('Diamonds')
+
+ggplot(diamonds, aes(carat, price, color = cut)) + geom_point() + scale_color_brewer(type = 'div', palette = 'Greys', direction = 1) + xlab('Carats') + ylab('Price') + ggtitle('Diamonds')
+
+ggplot(diamonds, aes(carat, price, color = cut)) + geom_point() + scale_color_brewer(type = 'div', palette = 'Spectral', direction = 1) + xlab('Carats') + ylab('Price') + ggtitle('Diamonds')
+
+ggplot(diamonds, aes(carat, price, color = cut)) + geom_point() + scale_color_brewer(type = 'div', palette = 'Set1', direction = 1) + xlab('Carats') + ylab('Price') + ggtitle('Diamonds')
+
+ggplot(diamonds, aes(carat, price, color = cut)) + geom_point() + scale_color_brewer(type = 'div', palette = 'Set3', direction = 1) + xlab('Carats') + ylab('Price') + ggtitle('Diamonds')
