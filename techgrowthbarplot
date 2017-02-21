@@ -1,0 +1,30 @@
+roundUpNice <- function(x, nice=c(1,2,4,5,6,8,10)) {
+  if(length(x) != 1) stop("'x' must be of length 1")
+  10^floor(log10(x)) * nice[[which(x <= 10^floor(log10(x)) * nice)[[1]]]]
+}
+
+easyplot <- function(data, title, ycap) {
+  bplot=barplot(data,
+                ylab = ycap,
+                ylim = c(0, roundUpNice(max(returns))), # Avoiding hard-coding
+                main = title, 
+                col = rainbow(length(data + 1)), 
+                border = NA,
+                axes = FALSE)
+  
+  text(x = bplot, 
+       y = ifelse(returns - (returns / 12) >= (max(data) / 2), returns - (returns / 12), returns), 
+       label = paste(returns, "%", sep=""), 
+       pos = 3, 
+       cex = 0.75,
+       col = "black")	
+  
+  labs <- seq(0, roundUpNice(max(returns)), by = 10)
+  
+  axis(side = 2, at = labs, labels = paste0(labs, "%"), cex.axis = 1)
+}
+# EVBG Q3 31.2
+returns <- c(59.6, 50.8, 22.4, 22.2, 11.6, 10.7, 3.3, 3.1, 1.2, 0.9)
+names(returns) <- c('TWLO','FB','AMZN','GOOG','PYPL','INTC','AAPL','EBAY','MSFT','TWTR')
+
+easyplot(returns, 'YoY Revenue Growth for Select Tech Companies (4Q16)', 'Percentage Growth')
