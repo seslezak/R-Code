@@ -1,6 +1,7 @@
 #This is another set of code to help make the transition from Excel to R
 
 #Open data file and view data.
+
 earnings <- read.csv('C:\\(Path)\\Employee_Earnings_Report_2014.csv', stringsAsFactors = FALSE)
 dim(earnings)
 head(earnings)
