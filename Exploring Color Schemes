@@ -21,3 +21,4 @@ ggplot(diamonds, aes(carat, price, color = cut)) + geom_point() + scale_color_br
 ggplot(diamonds, aes(carat, price, color = cut)) + geom_point() + scale_color_brewer(type = 'div', palette = 'Set1', direction = 1) + xlab('Carats') + ylab('Price') + ggtitle('Diamonds')
 
 ggplot(diamonds, aes(carat, price, color = cut)) + geom_point() + scale_color_brewer(type = 'div', palette = 'Set3', direction = 1) + xlab('Carats') + ylab('Price') + ggtitle('Diamonds')
+
