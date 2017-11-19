@@ -65,3 +65,4 @@ ggplot(diamonds, aes( carat, price, color = clarity)) + geom_point() +
 #Code from "How to Transition from Excel to R"
 #Tony Ojeda
 #https://districtdatalabs.silvrback.com/intro-to-r-for-microsoft-excel-users
+
