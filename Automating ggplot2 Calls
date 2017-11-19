@@ -39,6 +39,7 @@ viz_func2(mydat, 'value3') +
         ggtitle("Insert Different Title Here") +
         xlab("Different Date") + ylab("Different Value")
 
+
 #Code from "Automate the Boring Stuff:  ggplot2
 #Mathew Analytics Blog
 #http://mathewanalytics.com/
