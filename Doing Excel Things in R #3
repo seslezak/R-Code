@@ -31,7 +31,7 @@ stuff <- c('bread', 'cheese')
 prices <- c(2.1, 4)
 sprintf('%s costs $%3.2f', stuff, prices)
 
-#How to Sort
+#Sorting
 
 with(mtcars, mtcars[order(hp), ])
 with(mtcars, mtcars[order(hp, decreasing = TRUE), ])
