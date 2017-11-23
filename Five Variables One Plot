@@ -7,6 +7,10 @@ str(mpg)
 ggplot(data = mpg) + geom_point(mapping = aes(x = displ, y = hwy)) + 
         ggtitle("Displacement and Highway Mileage") + 
         labs(x = "engine displacement (in liters)", y = "highway mileage/gallon")
+        
+ggplot(data = mpg) + geom_jitter(mapping = aes(x = displ, y = hwy), width = 0.25, height = 0.25) + 
+        ggtitle("Displacement and Highway Mileage") + 
+        labs(x = "engine displacement (in liters)", y = "highway mileage/gallon")
 
 ggplot(data = mpg) + geom_point(mapping = aes(x = displ, y = hwy, alpha = class)) +
         ggtitle("Displacement and Highway Mileage") + 
