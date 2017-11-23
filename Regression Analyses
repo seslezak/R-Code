@@ -1,0 +1,71 @@
+
+library(dplyr)
+library(ggplot2)
+
+ggplot(data = mpg) + geom_smooth(mapping = aes(x = displ, y = hwy)) + 
+        ggtitle("Displacement and Highway Mileage") + 
+        labs(x = "engine displacement (in liters)", y = "highway mileage/gallon")
+
+ggplot(data = mpg) + geom_smooth(mapping = aes(x = displ, y = hwy), se = FALSE, span = 0.8) + 
+        ggtitle("Displacement and Highway Mileage") + 
+        labs(x = "engine displacement (in liters)", y = "highway mileage/gallon")
+
+ggplot(data = mpg) + geom_smooth(mapping = aes(x = displ, y = hwy, linetype = drv)) + 
+        ggtitle("Displacement and Highway Mileage by Drive Type") + 
+        labs(x = "engine displacement (in liters)", y = "highway mileage/gallon")
+
+ggplot(data = mpg) + geom_smooth(mapping = aes(x = displ, y = hwy, color = drv)) + 
+        ggtitle("Displacement and Highway Mileage by Drive Type") + 
+        labs(x = "engine displacement (in liters)", y = "highway mileage/gallon")
+
+ggplot(data = mpg) + 
+        geom_point(mapping = aes(x = displ, y = hwy, color = drv)) +
+        geom_smooth(mapping = aes(x = displ, y = hwy, color = drv, linetype = drv)) + 
+        ggtitle("Displacement and Highway Mileage by Drive Type") + 
+        labs(x = "engine displacement (in liters)", y = "highway mileage/gallon")
+
+ggplot(data = mpg, mapping = aes(x = displ, y = hwy, color = drv, linetype = drv)) +
+        geom_point() + geom_smooth() + 
+        ggtitle("Displacement and Highway Mileage by Drive Type") + 
+        labs(x = "engine displacement (in liters)", y = "highway mileage/gallon")
+
+ggplot(data = mpg, mapping = aes(x = displ, y = hwy, color = drv, linetype = drv)) +
+        geom_point(aes(shape = fl)) + geom_smooth(span = 0.6) + 
+        ggtitle("Displacement and Highway Mileage by Drive Type and Fuel") + 
+        labs(x = "engine displacement (in liters)", y = "highway mileage/gallon")
+
+ggplot(data = mpg, mapping = aes(x = displ, y = hwy)) +
+        geom_point(mapping = aes(color = class)) + geom_smooth() + 
+        ggtitle("Displacement and Highway Mileage by Class") + 
+        labs(x = "engine displacement (in liters)", y = "highway mileage/gallon")
+
+ggplot(data = mpg, mapping = aes(x = displ, y = hwy)) +
+        geom_point(mapping = aes(color = drv)) + geom_smooth() + 
+        ggtitle("Displacement and Highway Mileage by Drive Type") + 
+        labs(x = "engine displacement (in liters)", y = "highway mileage/gallon")
+
+ggplot(data = mpg, mapping = aes(x = displ, y = hwy)) +
+        geom_point(mapping = aes(color = class)) + 
+        geom_smooth(data = filter(mpg, class == "subcompact"), se = FALSE) + 
+        ggtitle("Displacement and Highway Mileage by Class") + 
+        labs(x = "engine displacement (in liters)", y = "highway mileage/gallon")
+
+ggplot(data = mpg, mapping = aes(x = displ, y = hwy)) +
+        geom_point(mapping = aes(color = class)) + 
+        geom_smooth(se = TRUE, span = 1) + 
+        ggtitle("Displacement and Highway Mileage by Class and Drive") + 
+        labs(x = "engine displacement (in liters)", y = "highway mileage/gallon") +
+        facet_wrap( ~ drv)
+
+ggplot(data = mpg, mapping = aes(x = displ, y = hwy)) +
+        geom_point(mapping = aes(color = class)) + 
+        geom_smooth(data = filter(mpg, class == "subcompact"), se = FALSE) + 
+        ggtitle("Displacement and Highway Mileage by Class") + 
+        labs(x = "engine displacement (in liters)", y = "highway mileage/gallon") +
+        facet_wrap( ~ class, nrow = 4)
+
+#Code based on
+#R for Data Science
+#by Hadley Wickham and Garrett Grolemund
+
+
