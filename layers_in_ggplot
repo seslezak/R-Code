@@ -1,0 +1,49 @@
+library(ggplot2)
+library(maps)
+
+ggplot(data = diamonds) + geom_bar(mapping = aes(x = cut))
+
+ggplot(data = diamonds) + stat_count(mapping = aes(x = cut)) + ggtitle("Diamond Cuts by Quality by Count")
+
+ggplot(data = diamonds) + geom_bar(mapping = aes(x = cut, y = ..prop.., group = 1)) + 
+        ggtitle("Diamond Cuts by Quality by Percent")
+
+ggplot(data = diamonds) + stat_summary(mapping = aes(x = cut, y = depth), fun.ymin = min, fun.ymax = max, fun.y = median) + 
+        ggtitle("Diamond Cuts by Quality by Depth")
+
+ggplot(data = diamonds) + geom_bar(mapping = aes(x = cut, color = cut)) + 
+        ggtitle("Diamond Cuts")
+
+ggplot(data = diamonds) + geom_bar(mapping = aes(x = cut, fill = cut)) + 
+        ggtitle("Diamond Cuts")
+
+ggplot(data = diamonds) + geom_bar(mapping = aes(x = cut, fill = clarity)) + 
+        ggtitle("Diamonds by Cut and Clarity")
+
+ggplot(data = diamonds, mapping = aes( x = cut, fill = clarity)) +
+        geom_bar(position = "fill") + ggtitle("Diamond Cuts by Clarity and Percent")
+
+ggplot(data = diamonds, mapping = aes( x = cut, fill = clarity)) +
+        geom_bar(position = "dodge") + ggtitle("Diamond Cuts by Clarity")
+
+ggplot(data = mpg, mapping = aes(x = class, y = hwy)) + geom_boxplot() + 
+        ggtitle("Highway Mileage by Class") + 
+        labs(x = "vehicle class", y = "highway mileage/gallon")
+
+ggplot(data = mpg, mapping = aes(x = class, y = hwy)) + geom_boxplot() + coord_flip() + 
+        ggtitle("Highway Mileage by Class") + 
+        labs(x = "vehicle class", y = "highway mileage/gallon")
+
+bargraph <- ggplot(data = diamonds) + geom_bar(mapping = aes(x = cut, fill = cut), show.legend = FALSE, width = 1) + 
+        theme(aspect.ratio = 1) +
+        ggtitle("Diamond Cuts")
+
+bargraph + coord_flip()
+
+bargraph + coord_polar()
+
+france <- map_data("france")
+
+ggplot(france, aes(long, lat, group = group)) + geom_polygon(color = "black", fill = "white")
+
+ggplot(france, aes(long, lat, group = group)) + geom_polygon(color = "black", fill = "white") + coord_quickmap()
