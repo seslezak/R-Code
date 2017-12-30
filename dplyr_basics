@@ -3,121 +3,42 @@ library(Lahman)
 library(stringr)
 library(ggplot2)
 library(forcats)
-```
 
-We create a subset of the Batting data for players in the 2014 season.  We want to get an idea how large our new data subset is, so we *count()* it.
-
-```{r}
 Bat14 <- Batting %>% filter(yearID == "2014")
 Bat14 %>% count()
-```
 
-It's always useful to get an overview of the data we are working with, so let's look at the data structure.  The *str()* command allows us to see all the variables (columns in the data frame) and some of the observations.
-
-```{r}
 str(Bat14)
-```
 
-The first *dplyr* function we want to work with is *select()*.  This allows us to isolate particular columns for our use.  We add a *head()* command to avoid producing a list of every row and observation under that column variable.
-
-```{r}
 Bat14 %>% select(teamID) %>% head(10)
-```
 
-We can specify any combination of variables we like with *select()*.
-
-```{r}
 Bat14 %>% select(teamID, lgID) %>% head(10)
 
-```
-
-We can also exclude specific columns if we wish.
-
-```{r}
 Bat14 %>% select(-teamID, -lgID, -yearID, -stint) %>% head(10)
-```
 
-Here is another way to achieve the same result. 
-
-```{r}
 Bat14 %>% select(c(-(2:5))) %>% head(10)
-```
 
-Either way works just fine. It's a judgement call.  Use the method you are more comfortable with, and which other users might find easier to understand. For example, the first method lets users know what variables are missing, but it is a little less elegant code.  The second method is more elegant than the first, but the changes we made aren't evident.  It's a good idea to add a note to code to help explain things.
-
-Now we turn to *group_by* which allows us to roll-up the data into chosen groups.  Here, we look at the two leagues and how many observations fall under each.
-
-```{r}
 Bat14 %>% group_by(lgID) %>% count()
-```
 
-Likewise, we can group by team.
-
-```{r}
 Bat14 %>% group_by(teamID) %>% count()
-```
 
-We can also use *group_by* to arrange by different groups.  Here, we are telling *R* to count observations by team and sort them by league.  This is the kind of thing a pivot table does in Excel or Google Sheets.
-
-```{r}
 Bat14 %>% group_by(lgID, teamID) %>% count()
-```
 
-We can call in any of the variables (columns) we want from our data frame.  We will be calculating Runs per Game soon, so we pull in the columns we need to work with. Note that now the observations are by each player because that's how the original data is structured.
-
-```{r}
 Bat14 %>% group_by(teamID, lgID, R, G) %>% count()
-```
 
-If we want to aggregate the data by team (as below) or by another factor, we can use the *summarize()* command.  We can run any math operation through this.  Here, we want to know the total number of walks (base on balls) for each team.
-
-```{r}
 Bat14 %>% group_by(teamID) %>% summarize(Total_BB = sum(BB))
-```
 
-We can do the same for any variable.  In this case, we aggregate hits.
-
-```{r}
 Bat14 %>% group_by(teamID) %>% summarize(Total_H = sum(H))
-```
 
-Notice that *R* gives us results in alphabetical order.  We can change that by using the *arrange()* command.  Here, we create two objects we will use for graphing in a bit.  They are *Runs* and *RpG*,
-
-```{r}
 Runs <- Bat14 %>% group_by(teamID) %>% summarize(Runs = sum(R)) %>% arrange(desc(Runs))
 RpG <- Bat14 %>% group_by(teamID) %>% summarize(RpG = sum(R) / 162) %>% arrange(desc(RpG))
-```
 
-Time to graph!
-
-We want to display the number of Runs per Game each team produced during the 2014 season.  We also want to plot them in order of size.  To do this, we specify in the *aes()* command the *reorder()* subcommand.  We use *-RpG* to indicated sort in descending order.
-
-If you want to build this graph layer by layer to see how *ggplot* works, start with the code through *geom_col()* then build it up from there.
-
-```{r}
 ggplot(RpG, aes(x = reorder(teamID, -RpG), y = RpG)) + geom_col() + aes(fill = teamID) +
   labs(title = "Runs per Game by Team, 2014 Season", x = "MLB Team", y = "R/G", caption = "from Lahman data base") + guides(fill = FALSE)
-```
 
-It is redundant to consider Total Runs and Runs per Game because RpG is just Total Runs divided by the number of games played, which is a constant 162 in baseball.  But it is another way to look at the same data.  In this case, we are sorting in ascending order.
-
-```{r}
 ggplot(Runs, aes(x = reorder(teamID, Runs), y = Runs)) + geom_col() + aes(fill = teamID) +
   labs(title = "Total Runs by Team, 2014 Season", x = "MLB Team", y = "Total Runs", caption = "from Lahman data base") + guides(fill = FALSE)
-```
 
-There are different ways to accomplish the same ends in programming.  There is no one right way that is better than the others.  Every programmer is different.  All we are trying to do is improve on how we write code.  
-
-So here is an alternate approach to producing the exact same graphs as above.  We will limit ourselves to reproducing the RpG chart.  The point is, there may be a million ways to do the same thing, so find the one you are most comfortable with which you think is also easy for others to use.
-
-We create a new object, *AltRpG*.
-
-```{r}
 AltRpG <- Bat14 %>% group_by(teamID) %>% summarize(Runs = sum(R)) %>% mutate("Runs/Game" = Runs / 162) %>% arrange(desc(Runs))
-```
 
-Then we graph it.  Notice it is identical to the Runs per Game chart we created earlier.
-
-```{r}
 ggplot(AltRpG, aes(x = reorder(teamID, -`Runs/Game`), y = `Runs/Game`)) + geom_col() + aes(fill = teamID) +
   labs(title = "Runs per Game by Team, 2014 Season", x = "MLB Team", y = "R/G", caption = "from Lahman data base") + guides(fill = FALSE)
