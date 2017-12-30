@@ -6,39 +6,23 @@ library(forcats)
 
 Bat14 <- Batting %>% filter(yearID == "2014")
 Bat14 %>% count()
-
 str(Bat14)
-
 Bat14 %>% select(teamID) %>% head(10)
-
 Bat14 %>% select(teamID, lgID) %>% head(10)
-
 Bat14 %>% select(-teamID, -lgID, -yearID, -stint) %>% head(10)
-
 Bat14 %>% select(c(-(2:5))) %>% head(10)
-
 Bat14 %>% group_by(lgID) %>% count()
-
 Bat14 %>% group_by(teamID) %>% count()
-
 Bat14 %>% group_by(lgID, teamID) %>% count()
-
 Bat14 %>% group_by(teamID, lgID, R, G) %>% count()
-
 Bat14 %>% group_by(teamID) %>% summarize(Total_BB = sum(BB))
-
 Bat14 %>% group_by(teamID) %>% summarize(Total_H = sum(H))
-
 Runs <- Bat14 %>% group_by(teamID) %>% summarize(Runs = sum(R)) %>% arrange(desc(Runs))
 RpG <- Bat14 %>% group_by(teamID) %>% summarize(RpG = sum(R) / 162) %>% arrange(desc(RpG))
-
 ggplot(RpG, aes(x = reorder(teamID, -RpG), y = RpG)) + geom_col() + aes(fill = teamID) +
   labs(title = "Runs per Game by Team, 2014 Season", x = "MLB Team", y = "R/G", caption = "from Lahman data base") + guides(fill = FALSE)
-
 ggplot(Runs, aes(x = reorder(teamID, Runs), y = Runs)) + geom_col() + aes(fill = teamID) +
   labs(title = "Total Runs by Team, 2014 Season", x = "MLB Team", y = "Total Runs", caption = "from Lahman data base") + guides(fill = FALSE)
-
 AltRpG <- Bat14 %>% group_by(teamID) %>% summarize(Runs = sum(R)) %>% mutate("Runs/Game" = Runs / 162) %>% arrange(desc(Runs))
-
 ggplot(AltRpG, aes(x = reorder(teamID, -`Runs/Game`), y = `Runs/Game`)) + geom_col() + aes(fill = teamID) +
   labs(title = "Runs per Game by Team, 2014 Season", x = "MLB Team", y = "R/G", caption = "from Lahman data base") + guides(fill = FALSE)
