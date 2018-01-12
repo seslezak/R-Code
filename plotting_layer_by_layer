@@ -146,4 +146,3 @@ Bat14HRplot + facet_wrap( ~ lgID )
 Bat14HRplot + facet_wrap( ~ teamID)
 Bat14HRplot + facet_grid(lgID ~ teamID)
 
-
