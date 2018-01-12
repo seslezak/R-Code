@@ -1,0 +1,6 @@
+library(leaflet)
+library(magrittr)
+leaflet() %>%
+        setView(-118.4452, 34.0689, zoom = 16) %>%
+        addTiles() %>%
+        addMarkers(-118.4452, 34.0689, popup = "UCLA")
