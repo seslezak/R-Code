@@ -15,6 +15,26 @@ for (i in 1:100){
                 if (i%%5==0) print("buzz") else
                         print(i)
 }
+#Third, with a function using for loops and else if statements
 
-#Code from librestats
+fizzbuzz <- function(n) {
+        for(i in c(1:n)) {
+                if(i %% 15 == 0) {
+                        print("FizzBuzz")
+                }
+                else if(i %% 3 == 0) {
+                        print("Fizz")
+                }
+                else if (i %% 5 == 0) {
+                        print("Buzz")
+                }
+                else{
+                        print(i)
+                }
+        }
+        
+}
+
+#Examples 1 and 2 from librestats
 #http://librestats.com/2012/01/10/honing-your-r-skills-for-job-interviews/
+#Example 3 from UCLA Data Science, Joshua Cook
