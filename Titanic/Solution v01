@@ -1,0 +1,22 @@
+library(tidyverse)
+Train <- read_csv("C:/ ~ /train.csv")
+Test <- read_csv("C:/ ~ /test.csv")
+summary(Train)
+head(Train)
+head(Test)
+dim(Train)
+dim(Test)
+str(Train)
+str(Test)
+MissingColumn <- colnames(Train) %in% colnames(Test)
+colnames(Train[MissingColumn == FALSE])
+table(Train$Survived)
+prop.table(table(Train$Survived))
+SurviveSex <- table(Train$Sex, Train$Survived)
+plot(SurviveSex)
+TestF <- Test
+TestF$Survived <- 0
+TestF$Survived[TestF$Sex == 'female'] <- 1
+Solution01 <- data.frame(PassengerId = TestF$PassengerId, Survived = TestF$Survived)
+Solution01[is.na(Solution01)] <- 0
+write_csv(Solution01, path = "C:/ ~ /Titanic Solution 01.csv", col_names = TRUE)
