@@ -1,0 +1,61 @@
+library(tidyverse)
+library(rpart)
+library(corrplot)
+library(rattle)
+library(rpart.plot)
+library(RColorBrewer)
+
+Train <- read_csv("C:/ ~ /train.csv")
+Test <- read_csv("C:/ ~ /test.csv")
+summary(Train)
+head(Train)
+head(Test)
+dim(Train)
+dim(Test)
+str(Train)
+str(Test)
+MissingColumn <- colnames(Train) %in% colnames(Test)
+colnames(Train[MissingColumn == FALSE])
+table(Train$Survived)
+prop.table(table(Train$Survived))
+SurviveSex <- table(Train$Sex, Train$Survived)
+plot(SurviveSex)
+colSums(is.na(Train))
+colSums(is.na(Test))
+Train2 <- Train
+Test2 <- Test
+Test2$Survived <- NA
+
+#Digression to Create Correlation Plot
+TrainCorr <- Train
+TrainCorr$Age[is.na(TrainCorr$Age)] <- median(TrainCorr$Age, na.rm = TRUE)
+TrainCorr$PassengerId <- NULL
+TrainCorr$Name <- NULL
+TrainCorr$Ticket <- NULL
+TrainCorr$Cabin <- NULL
+str(TrainCorr)
+TrainCorr$Sex <- as.integer(TrainCorr$Sex == 'female')
+TrainCorr$Fare <- factor(TrainCorr$Fare)
+TrainCorr <- Filter(is.numeric, TrainCorr)
+str(TrainCorr)
+TrainCorrPlot <- cor(TrainCorr)
+TrainCorrPlot
+corrplot(TrainCorrPlot, method = "number", type = "lower")
+
+#Back to Solution
+Combo <- rbind(Train2, Test2)
+Combo[!complete.cases(Combo$Fare),]
+Combo$Fare[1044] <- median(Combo$Fare, na.rm = TRUE)
+Combo$Age[is.na(Combo$Age)] <- median(Combo$Age, na.rm = TRUE)
+sum(is.na(Combo$Age))
+Combo$Cabin <- NULL
+Train2 <- Combo[1:891, ]
+Test2 <- Combo[892:1309, ]
+Sol02 <- rpart(Survived ~ Pclass + Sex + Age + SibSp + Parch + Fare + Embarked, data = Train2, method = "class")
+Sol02
+fancyRpartPlot(Sol02)
+Pred02 <- predict(Sol02, newdata = Test2, type = "class")
+Pred02df <- data.frame(PassengerId = Test2$PassengerId, Survived = Pred02)
+nrow(Pred02df)
+write_csv(Pred02df, path = "C:/ ~ /Titanic Solution 02.csv", col_names = TRUE)
+
