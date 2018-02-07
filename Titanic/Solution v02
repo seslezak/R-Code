@@ -58,3 +58,5 @@ Pred02 <- predict(Sol02, newdata = Test2, type = "class")
 Pred02df <- data.frame(PassengerId = Test2$PassengerId, Survived = Pred02)
 nrow(Pred02df)
 write_csv(Pred02df, path = "C:/ ~ /Titanic Solution 02.csv", col_names = TRUE)
+
+#Kaggle Score 77.033
