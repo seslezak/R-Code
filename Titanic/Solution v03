@@ -97,3 +97,4 @@ Pred03df <- data.frame(PassengerId = Test2$PassengerId, Survived = Sol03)
 write_csv(Pred03df, path = "C:/ ~ /Titanic Solution 03.csv", col_names = TRUE)
 
 
+
