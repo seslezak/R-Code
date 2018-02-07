@@ -101,4 +101,4 @@ Sol04 <- predict(RandForModel, Test2)
 Pred04df <- data.frame(PassengerId = Test2$PassengerId, Survived = Sol04)
 write_csv(Pred04df, path = "C:/ ~ /Titanic Solution 04.csv", col_names = TRUE)
 
-Kaggle Score 78.95 3084/9654 32%
+#Kaggle Score 78.95 3084/9654 32%
