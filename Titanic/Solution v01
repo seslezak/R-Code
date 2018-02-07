@@ -21,3 +21,5 @@ TestF$Survived[TestF$Sex == 'female'] <- 1
 Solution01 <- data.frame(PassengerId = TestF$PassengerId, Survived = TestF$Survived)
 Solution01[is.na(Solution01)] <- 0
 write_csv(Solution01, path = "C:/ ~ /Titanic Solution 01.csv", col_names = TRUE)
+
+#Kaggle Score 76.555
