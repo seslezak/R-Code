@@ -1,0 +1,45 @@
+#Results:  1549 out of 9600; top 16%, 84th percentile
+
+library(rpart)
+library(rpart.plot)
+library(RColorBrewer)
+library(rattle)
+
+train <- read.csv("C:/ ~ /train.csv", stringsAsFactors = FALSE)
+train$Name[1]
+str(train$Name)
+test <- read.csv("C:/ ~ /test.csv")
+test$Survived <-  NA
+combi <- rbind(train, test)
+strsplit(combi$Name[1], split = '[,.]')
+strsplit(combi$Name[1], split = '[,.]')[[1]]
+strsplit(combi$Name[1], split = '[,.]')[[1]][2]
+combi$Title <- sapply(combi$Name, FUN = function(x) {strsplit(x, split = '[,.]')[[1]][2]})
+combi$Title <- sub(' ', '', combi$Title)
+table(combi$Title)
+combi$Title[combi$Title %in% c('Mme', 'Mrs')] <-  'Mrs'
+combi$Title[combi$Title %in% c('Mlle', 'Miss', 'Ms')] <-  'Miss'
+combi$Title[combi$Title %in% c('Dona', 'Lady', 'the Countess')] <-  'Lady'
+combi$Title[combi$Title %in% c('Dr', 'Rev', 'Sir', 'Don', 'Jonkheer')] <-  'Sir'
+combi$Title[combi$Title %in% c('Capt', 'Col', 'Major')] <-  'Col'
+combi$Title <- as.factor(combi$Title)
+str(combi)
+combi$FamSize <- combi$SibSp + combi$Parch + 1
+combi$Surname <- sapply(combi$Name, FUN = function(x) {strsplit(x, split = '[,.]')[[1]][1]})
+combi$FamID <- paste(as.character(combi$FamSize), combi$Surname, sep = "")
+combi$FamID[combi$FamSize <= 2] <- 'Small'
+table(combi$FamID)
+FamIDs <- data.frame(table(combi$FamID))
+FamIDs <- FamIDs[FamIDs$Freq <= 2, ]
+combi$FamID[combi$FamID %in% FamIDs$Var1] <- 'Small'
+combi$FamID <- as.factor(combi$FamID)
+str(combi)
+train <- combi[1:891, ]
+test <- combi[892:1309, ]
+fit <- rpart(Survived ~ Pclass + Sex + Age + SibSp + Parch + Fare + Embarked + Title + FamSize + FamID, data = train, method = 'class')
+fancyRpartPlot(fit)
+Prediction <- predict(fit, test, type = 'class')
+submit <- data.frame(PassengerId = test$PassengerId, Survived = Prediction)
+write.csv(submit, file = 'Titanic Solution 08.csv', row.names = FALSE)
+
+
