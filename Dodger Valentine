@@ -1,0 +1,9 @@
+plot.new()
+par(bg = NA)
+plot.window(xlim = c(-16, 16), ylim = c(-16, 13))
+mapply(function(r, col) {
+        t <- seq(0, 2 * pi, length.out = 100)
+        x <- r * sin(t)^3
+        y <- (13 * r/16) * cos(t) - (5 * r/16) * cos(2 * t) - (2 * r/16) * cos(3 * t) - (r/16) * cos(4 * t)
+        polygon(x, y, col = col, border = NA)
+}, seq(16, 0, length.out = 100), colorRampPalette(c('dodgerblue', 'grey84'))(100))
