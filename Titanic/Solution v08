@@ -6,10 +6,10 @@ library(RColorBrewer)
 library(rattle)
 library(tidyverse)
 
-train <- read.csv("C:/Users/Steven/Desktop/R Projects/UCLA DSI/Titanic/train.csv", stringsAsFactors = FALSE)
+train <- read.csv("C:/ ~ /train.csv", stringsAsFactors = FALSE)
 train$Name[1]
 str(train$Name)
-test <- read.csv("C:/Users/Steven/Desktop/R Projects/UCLA DSI/Titanic/test.csv")
+test <- read.csv("C:/ ~ /test.csv")
 test$Survived <-  NA
 combi <- rbind(train, test)
 str(combi)
@@ -24,11 +24,11 @@ strsplit(combi$Name[1], split = '[,.]')[[1]][2]
 combi$Title <- sapply(combi$Name, FUN = function(x) {strsplit(x, split = '[,.]')[[1]][2]})
 combi$Title <- sub(' ', '', combi$Title)
 table(combi$Title)
-combi$Title[combi$Title %in% c('Mme', 'Mrs')] <-  'Mrs'
+combi$Title[combi$Title %in% c('Mme', 'Mrs', 'Dona', 'Lady', 'the Countess')] <-  'Mrs'
 combi$Title[combi$Title %in% c('Mlle', 'Miss', 'Ms')] <-  'Miss'
-combi$Title[combi$Title %in% c('Dona', 'Lady', 'the Countess')] <-  'Lady'
 combi$Title[combi$Title %in% c('Dr', 'Rev', 'Sir', 'Don', 'Jonkheer')] <-  'Sir'
 combi$Title[combi$Title %in% c('Capt', 'Col', 'Major')] <-  'Col'
+table(combi$Title)
 combi$Title <- as.factor(combi$Title)
 str(combi)
 combi$FamSize <- combi$SibSp + combi$Parch + 1
@@ -48,5 +48,3 @@ fancyRpartPlot(fit)
 Prediction <- predict(fit, test, type = 'class')
 submit <- data.frame(PassengerId = test$PassengerId, Survived = Prediction)
 write.csv(submit, file = 'Titanic Solution 08.csv', row.names = FALSE)
-
-
