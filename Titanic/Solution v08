@@ -1,16 +1,23 @@
-#Results:  1549 out of 9600; top 16%, 84th percentile
+#Results:  1548 out of 9598; top 16.1%, 83.9 percentile
 
 library(rpart)
 library(rpart.plot)
 library(RColorBrewer)
 library(rattle)
+library(tidyverse)
 
-train <- read.csv("C:/ ~ /train.csv", stringsAsFactors = FALSE)
+train <- read.csv("C:/Users/Steven/Desktop/R Projects/UCLA DSI/Titanic/train.csv", stringsAsFactors = FALSE)
 train$Name[1]
 str(train$Name)
-test <- read.csv("C:/ ~ /test.csv")
+test <- read.csv("C:/Users/Steven/Desktop/R Projects/UCLA DSI/Titanic/test.csv")
 test$Survived <-  NA
 combi <- rbind(train, test)
+str(combi)
+summary(combi$Age)
+MedAge <- median(combi$Age, na.rm = TRUE )
+MedAge
+combi$Age[is.na(combi$Age)] <- MedAge
+sum(is.na(combi$Age))
 strsplit(combi$Name[1], split = '[,.]')
 strsplit(combi$Name[1], split = '[,.]')[[1]]
 strsplit(combi$Name[1], split = '[,.]')[[1]][2]
