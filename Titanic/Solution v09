@@ -1,0 +1,69 @@
+#Kaggle Competition Position:  512 of 9599.  Top 5.3%.  94.7 percentile.
+
+
+library(rpart)
+library(rpart.plot)
+library(RColorBrewer)
+library(rattle)
+library(randomForest)
+library(party)
+
+train <- read.csv("C:/ ~ /train.csv", stringsAsFactors = FALSE)
+train$Name[1]
+str(train$Name)
+test <- read.csv("C:/ ~ /test.csv")
+test$Survived <-  NA
+combi <- rbind(train, test)
+strsplit(combi$Name[1], split = '[,.]')
+strsplit(combi$Name[1], split = '[,.]')[[1]]
+strsplit(combi$Name[1], split = '[,.]')[[1]][2]
+combi$Title <- sapply(combi$Name, FUN = function(x) {strsplit(x, split = '[,.]')[[1]][2]})
+combi$Title <- sub(' ', '', combi$Title)
+table(combi$Title)
+combi$Title[combi$Title %in% c('Mme', 'Mrs', 'Dona', 'Lady', 'the Countess')] <-  'Mrs'
+combi$Title[combi$Title %in% c('Mlle', 'Miss', 'Ms')] <-  'Miss'
+combi$Title[combi$Title %in% c('Dr', 'Rev', 'Sir', 'Don', 'Jonkheer')] <-  'Sir'
+combi$Title[combi$Title %in% c('Capt', 'Col', 'Major')] <-  'Col'
+combi$Title <- as.factor(combi$Title)
+table(combi$Title)
+str(combi)
+combi$FamSize <- combi$SibSp + combi$Parch + 1
+combi$Surname <- sapply(combi$Name, FUN = function(x) {strsplit(x, split = '[,.]')[[1]][1]})
+combi$FamID <- paste(as.character(combi$FamSize), combi$Surname, sep = "")
+combi$FamID[combi$FamSize <= 2] <- 'Small'
+table(combi$FamID)
+FamIDs <- data.frame(table(combi$FamID))
+FamIDs <- FamIDs[FamIDs$Freq <= 2, ]
+combi$FamID[combi$FamID %in% FamIDs$Var1] <- 'Small'
+combi$FamID <- as.factor(combi$FamID)
+str(combi)
+summary(combi$Age)
+sum(is.na(combi$Age))
+AgeFit <- rpart(Age ~ Pclass + Sex + SibSp + Parch + Fare + Embarked + Title + FamSize, data = combi[!is.na(combi$Age), ], method = 'anova')
+combi$Age[is.na(combi$Age)] <- predict(AgeFit, combi[is.na(combi$Age), ])
+summary(combi$Age)
+summary(combi)
+sum(is.na(combi$Embarked))
+which(combi$Embarked == '')
+combi$Embarked[c(62, 830)] = 'S'
+summary(combi$Fare)
+which(is.na(combi$Fare))
+combi$Fare[1044] <- median(combi$Fare, na.rm = TRUE)
+combi$FamID2 <- combi$FamID
+combi$FamID2 <- as.character(combi$FamID2)
+combi$FamID2[combi$FamSize <= 3] <- 'Small'
+combi$FamID2 <- as.factor(combi$FamID2)
+train <- combi[1:891, ]
+test <- combi[892:1309, ]
+set.seed(805)
+train$Survived <- as.factor(train$Survived)
+train$Sex <- as.factor(train$Sex)
+train$Embarked <- as.factor(train$Embarked)
+test$Sex <- as.factor(test$Sex)
+test$Embarked <- as.factor(test$Embarked)
+str(train$Survived)
+set.seed(805)
+fit <- cforest(Survived ~ Pclass + Sex + Age + SibSp + Parch + Fare + Embarked + Title + FamSize + FamID, data = train, controls = cforest_unbiased(ntree = 2000, mtry = 3))
+Prediction <- predict(fit, test, OOB = TRUE, type = 'response')
+submit <- data.frame(PassengerId = test$PassengerId, Survived = Prediction)
+write.csv(submit, file = 'Titanic Solution 09.csv', row.names = FALSE)
