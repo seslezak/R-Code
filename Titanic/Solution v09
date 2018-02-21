@@ -1,4 +1,4 @@
-#Kaggle Competition Score: 0.80861.  512 of 9599.  Top 5.3%.  94.7 percentile.
+#Kaggle Competition Score: 0.81339.  511 of 9628.  Top 5.3%.  94.7 percentile.
 
 
 library(rpart)
