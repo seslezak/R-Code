@@ -1,5 +1,6 @@
 #Two Solutions for the Fizzbuzz Puzzle in R
 
+
 #First, by vectorizing
 
 m <- 1:100
