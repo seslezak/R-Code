@@ -1,6 +1,7 @@
 library(ggplot2)
 library(maps)
 
+
 ggplot(data = diamonds) + geom_bar(mapping = aes(x = cut))
 
 ggplot(data = diamonds) + stat_count(mapping = aes(x = cut)) + ggtitle("Diamond Cuts by Quality by Count")
