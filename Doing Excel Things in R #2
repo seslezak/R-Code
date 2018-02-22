@@ -2,6 +2,7 @@
 
 #Open data file and view data.
 
+#Source:  https://github.com/andrewbtran/excel_to_r/blob/master/Employee_Earnings_Report_2014.csv
 earnings <- read.csv('C:\\(Path)\\Employee_Earnings_Report_2014.csv', stringsAsFactors = FALSE)
 dim(earnings)
 head(earnings)
