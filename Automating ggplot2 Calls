@@ -1,5 +1,6 @@
 #A set of functions to automate some common calls used in ggplot2. It is useful to learn how to automate repetitive coding structures.
 
+
 library(ggplot2)
 
 mydat <- data.frame(date = c(seq(as.Date("2010/01/01"), as.Date("2010/01/31"), by=1)),
