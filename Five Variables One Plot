@@ -1,5 +1,6 @@
 #Some code useful in developing different views of a single data set in R.
 
+
 library(ggplot2)
 
 str(mpg)
