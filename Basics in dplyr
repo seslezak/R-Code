@@ -4,6 +4,7 @@ library(stringr)
 library(ggplot2)
 library(forcats)
 
+
 Bat14 <- Batting %>% filter(yearID == "2014")
 Bat14 %>% count()
 str(Bat14)
