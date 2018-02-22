@@ -1,6 +1,7 @@
 #Here are some things you can do in R that are usually done in Excel.
 #Make sure to view each new object you create to follow the changes you've made.
 
+
 library(ggplot2)
 library(dplyr)
 library(reshape2)
