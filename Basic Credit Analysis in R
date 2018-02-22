@@ -1,4 +1,3 @@
-
 url <- 'https://onlinecourses.science.psu.edu/stat857/sites/onlinecourses.science.psu.edu.stat857/files/german_credit.csv'
 credit <- read.csv(url, header = TRUE, sep = ',')
 credit$No.of.Credits.at.this.Bank[credit$No.of.Credits.at.this.Bank == 4] <- 3
