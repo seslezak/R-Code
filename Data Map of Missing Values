@@ -1,5 +1,6 @@
 #This first code illustrates how to create a simple graphic representation of a dataset, showing which data are missing.
 
+
 library(dplyr)
 library(wakefield)
 library(Amelia)
