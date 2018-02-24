@@ -1,0 +1,68 @@
+#FIRST METHOD, Standard Scaling
+
+#source("https://bioconductor.org/biocLite.R")
+#biocLite("pcaMethods")
+library(pcaMethods)
+
+iris
+str(iris)
+pairs(iris[-5], col = iris$Species, lower.panel = NULL, pch = 16, cex = 0.75)
+legend('bottomleft', bty = 'n', legend = c('Setosa', 'Versicolor', 'Virginica'), pch = 16, col = c('black', 'red', 'green'), xpd = TRUE, cex = 1.25, y.intersp = 1.5)
+dev.off()
+irisPCA <- prcomp(scale(iris[-5]))
+irisPCA
+summary(irisPCA)
+plot(irisPCA, type = 'lines')
+plot(irisPCA$x[, 1:2], col = iris$Species)
+irisOutlier <- iris
+irisOutlier[4, ] <- irisOutlier[4, ] * 30
+outlierPCA <- prcomp(scale(irisOutlier[, -5]))
+outlierPCA
+plot(outlierPCA$x[, 1:2], col = iris$Species)
+irisPCAmethods <- pca(iris[, -5], scale = 'uv', center = TRUE, nPcs = 2, method = 'svd')
+slplot(irisPCAmethods, scoresLoadings = c(TRUE, TRUE), scol = iris$Species)
+str(irisPCAmethods)
+irisPCAmethods@R2
+irisPCAmethods@R2cum
+
+#SECOND METHOD, log scaling and Box-Cox
+
+library(devtools)
+install_github("vqv/ggbiplot", "vqv")
+library(ggbiplot)
+library(caret)
+library(ggplot2)
+
+iris
+logIris <- log(iris[, -5])
+irisSpecies <- iris[, 5]
+irisPCA <- prcomp(logIris, center = TRUE, scale. = TRUE)
+irisPCA
+plot(irisPCA, type = 'lines')
+summary(irisPCA)
+predict(irisPCA, newdata = tail(logIris, 10))
+biplot(irisPCA)
+ggbiplot(irisPCA, obs.scale = 1, var.scale = 1, groups = irisSpecies, ellipse = TRUE, circle = TRUE) +
+        scale_color_discrete(name = '') +
+        theme(legend.direction = 'horizontal', legend.position = 'top')
+#to make a unit circle
+theta <- seq(0, 2 * pi, length.out = 100)
+circle <- data.frame(x = cos(theta), y = sin(theta))
+p <- ggplot(circle, aes(x, y)) + geom_path()
+p
+#to add the iris PCA information
+loadings <- data.frame(irisPCA$rotation, .names = row.names(irisPCA$rotation))
+p + geom_text(data = loadings, mapping = aes(x = PC1, y = PC2, label = .names, color = .names)) +
+        coord_fixed(ratio = 1) + labs(x = 'PC1', y = 'PC2')
+
+#Caret Method (Box-Cox)
+irisBCTrans <- preProcess(iris[, -5], method = c('BoxCox', 'center', 'scale', 'pca'))
+irisPred <- predict(irisBCTrans, iris[, -5])
+head(irisPred, 5)
+irisBCTrans$rotation
+irisPCA$rotation
+irisBCTrans$rotation - irisPCA$rotation
+
+
+
+        
