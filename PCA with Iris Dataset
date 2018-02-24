@@ -62,7 +62,3 @@ head(irisPred, 5)
 irisBCTrans$rotation
 irisPCA$rotation
 irisBCTrans$rotation - irisPCA$rotation
-
-
-
-        
