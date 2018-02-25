@@ -1,4 +1,4 @@
-#FIRST METHOD, Standard Scaling
+#FIRST METHOD (Standard Scaling)
 
 #source("https://bioconductor.org/biocLite.R")
 #biocLite("pcaMethods")
@@ -25,7 +25,7 @@ str(irisPCAmethods)
 irisPCAmethods@R2
 irisPCAmethods@R2cum
 
-#SECOND METHOD, log scaling and Box-Cox
+#SECOND METHOD (Log Scaling)
 
 library(devtools)
 install_github("vqv/ggbiplot", "vqv")
@@ -55,10 +55,47 @@ loadings <- data.frame(irisPCA$rotation, .names = row.names(irisPCA$rotation))
 p + geom_text(data = loadings, mapping = aes(x = PC1, y = PC2, label = .names, color = .names)) +
         coord_fixed(ratio = 1) + labs(x = 'PC1', y = 'PC2')
 
-#Caret Method (Box-Cox)
+# THIRD METHOD (Box-Cox)
+
 irisBCTrans <- preProcess(iris[, -5], method = c('BoxCox', 'center', 'scale', 'pca'))
 irisPred <- predict(irisBCTrans, iris[, -5])
 head(irisPred, 5)
 irisBCTrans$rotation
 irisPCA$rotation
 irisBCTrans$rotation - irisPCA$rotation
+
+#FOURTH METHOD (Dummy Variables)
+
+library(dummies)
+library(tidyverse)
+library(ggplot2)
+
+irisDummy <- iris
+irisNames <- dummy(irisDummy$Species, sep = ':')
+irisDummy <- cbind(irisDummy, irisNames)
+#irisDummy$Species = NULL
+irisDummy <- as.tibble(irisDummy)
+pairs(irisDummy[-(5:8)], col = irisDummy$Species)
+head(irisDummy)
+str(irisDummy)
+
+Iris1 <- ggplot(irisDummy, aes(x = Sepal.Length, y = ..density..)) +
+        geom_histogram(binwidth = .2, col = 'black', fill = 'grey') +
+        geom_density(col = 'red')
+Iris2 <- ggplot(irisDummy, aes(x = Sepal.Width, y = ..density..)) +
+        geom_histogram(binwidth = .2, col = 'black', fill = 'grey') +
+        geom_density(col = 'red')
+Iris3 <- ggplot(irisDummy, aes(x = Petal.Length, y = ..density..)) +
+        geom_histogram(binwidth = .2, col = 'black', fill = 'grey') +
+        geom_density(col = 'red')
+Iris4 <- ggplot(irisDummy, aes(x = Petal.Length, y = ..density..)) +
+        geom_histogram(binwidth = .2, col = 'black', fill = 'grey') +
+        geom_density(col = 'red')
+cowplot::plot_grid(Iris1, Iris2, Iris3, Iris4, nrow = 1)
+irisPCA3 <- prcomp(scale(irisDummy[-(5:8)]))
+irisPCA3
+plot(irisPCA3, type = 'lines')
+summary(irisPCA3)
+
+
+
