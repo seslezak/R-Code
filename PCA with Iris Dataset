@@ -64,11 +64,12 @@ irisBCTrans$rotation
 irisPCA$rotation
 irisBCTrans$rotation - irisPCA$rotation
 
-#FOURTH METHOD (Dummy Variables)
+#FOURTH METHOD (Dummy Variables, a la UCLA DSI)
 
 library(dummies)
 library(tidyverse)
 library(ggplot2)
+library(reshape2)
 
 irisDummy <- iris
 irisNames <- dummy(irisDummy$Species, sep = ':')
@@ -78,7 +79,6 @@ irisDummy <- as.tibble(irisDummy)
 pairs(irisDummy[-(5:8)], col = irisDummy$Species)
 head(irisDummy)
 str(irisDummy)
-
 Iris1 <- ggplot(irisDummy, aes(x = Sepal.Length, y = ..density..)) +
         geom_histogram(binwidth = .2, col = 'black', fill = 'grey') +
         geom_density(col = 'red')
@@ -88,14 +88,26 @@ Iris2 <- ggplot(irisDummy, aes(x = Sepal.Width, y = ..density..)) +
 Iris3 <- ggplot(irisDummy, aes(x = Petal.Length, y = ..density..)) +
         geom_histogram(binwidth = .2, col = 'black', fill = 'grey') +
         geom_density(col = 'red')
-Iris4 <- ggplot(irisDummy, aes(x = Petal.Length, y = ..density..)) +
+Iris4 <- ggplot(irisDummy, aes(x = Petal.Width, y = ..density..)) +
         geom_histogram(binwidth = .2, col = 'black', fill = 'grey') +
         geom_density(col = 'red')
 cowplot::plot_grid(Iris1, Iris2, Iris3, Iris4, nrow = 1)
 irisPCA3 <- prcomp(scale(irisDummy[-(5:8)]))
 irisPCA3
-plot(irisPCA3, type = 'lines')
 summary(irisPCA3)
+plot(irisPCA3, type = 'lines')
+loadings <- data.frame(irisPCA3$rotation, .names = row.names(irisPCA3$rotation))
+loadings
+melted <- melt(loadings)
+colnames(melted)[1] <- 'names'
+melted <- arrange(melted, names)
+type <- as.matrix(c(rep(3, 4), rep(4, 4), rep(1, 4), rep(2, 4)))
+melted <- cbind(type, melted)
+melted <- arrange(melted, type)
+melted
+ggplot(melted, aes(x = variable, y = value, fill = names)) + geom_bar(stat = 'identity', position = 'dodge') + guides(fill = guide_legend(reverse = TRUE))
+
+
 
 
 
