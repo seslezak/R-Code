@@ -1,3 +1,5 @@
+#Loops aren't really necessary anymore in R, but here are a few examples of how to build them.
+
 i <- 0
 repeat{
   i <- i + 4
