@@ -28,3 +28,4 @@ returns <- c(59.6, 50.8, 22.4, 22.2, 11.6, 10.7, 3.3, 3.1, 1.2, 0.9)
 names(returns) <- c('TWLO','FB','AMZN','GOOG','PYPL','INTC','AAPL','EBAY','MSFT','TWTR')
 
 easyplot(returns, 'YoY Revenue Growth for Select Tech Companies (4Q16)', 'Percentage Growth')
+
