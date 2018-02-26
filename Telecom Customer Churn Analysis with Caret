@@ -100,3 +100,4 @@ ggplot(fdaTune) + theme(legend.position = 'top')
 #The Caret Package: A United Interface for Predictive Models
 #Kuhn, Max
 #February 26, 2014
+
