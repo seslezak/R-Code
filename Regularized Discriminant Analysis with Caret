@@ -4,6 +4,7 @@
 library(caret)
 library(mlbench)
 library(klaR)
+
 data(Sonar)
 set.seed(123)
 inTrain <- createDataPartition(y = Sonar$Class, p = 0.75, list = FALSE)
