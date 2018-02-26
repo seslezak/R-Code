@@ -3,7 +3,6 @@ library(Lahman)
 library(ggplot2)
 library(dplyr)
 
-
 #Simple Scatterplot
 Bat14 <- Batting %>% filter(yearID == "2014")
 ggplot(data = Bat14, aes(x = AB, y = HR))
