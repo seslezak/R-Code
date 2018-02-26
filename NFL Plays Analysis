@@ -3,6 +3,7 @@
 #Click on "Sample Data (Week 1 - 8 2015)
 #Choose PLAY.csv, renamed nfl_plays.csv in this example
 
+
 #Open File and Examine Data
 nfldata <- read.csv('C:\\(Path)\\nfl_plays.csv', header = TRUE)
 dim(nfldata)
