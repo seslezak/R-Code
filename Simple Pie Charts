@@ -2,6 +2,7 @@
 
 #The first is fully automated.
 
+
 pie(table(iris$Species))
 
 #The second is more customized with labels and legends.
