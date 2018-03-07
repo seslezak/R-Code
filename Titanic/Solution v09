@@ -1,4 +1,4 @@
-#Kaggle Score: 0.81339.  476 of 10233.  Top 4.7%.  95.3%.
+#Kaggle Score: 0.81339.  475 of 10236.  Top 4.6%.  95.4%.
 
 
 library(rpart)
