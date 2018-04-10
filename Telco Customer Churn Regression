@@ -1,0 +1,212 @@
+
+
+
+library(tidyverse)
+library(magrittr)
+library(ggplot2)
+library(plyr)
+library(gridExtra)
+library(ggthemes)
+library(caret)
+library(MASS)
+library(randomForest)
+library(party)
+library(corrplot)
+library(fastDummies)
+library(tree)
+library(randomForest)
+library(gbm)
+
+ChurnURL <- 'https://community.watsonanalytics.com/wp-content/uploads/2015/03/WA_Fn-UseC_-Telco-Customer-Churn.csv'
+ChurnData <- read.csv(url(ChurnURL), sep = ",", header = TRUE, stringsAsFactors = FALSE)
+ChurnData <- as.tibble(ChurnData)
+str(ChurnData)
+sapply(ChurnData, function(x) sum(is.na(x)))
+ChurnData$TotalCharges[is.na(ChurnData$TotalCharges)] <- 0
+sum(is.na(ChurnData$TotalCharges))
+
+ChurnData$gender <- as.factor(mapvalues(ChurnData$gender,
+                                      from = c('Female', 'Male'), to = c(-1, 1)))
+ChurnData$SeniorCitizen <- as.factor(mapvalues(ChurnData$SeniorCitizen,
+                                      from = c('0', '1'), to = c('No', 'Yes')))
+ChurnData$MultipleLines <- as.factor(mapvalues(ChurnData$MultipleLines,
+                                from = 'No phone service', to = 'No'))
+ChurnData$OnlineSecurity <- as.factor(mapvalues(ChurnData$OnlineSecurity,
+                                      from = 'No internet service', to = 'No'))
+ChurnData$OnlineBackup <- as.factor(mapvalues(ChurnData$OnlineBackup,
+                                      from = 'No internet service', to = 'No'))
+ChurnData$DeviceProtection <- as.factor(mapvalues(ChurnData$DeviceProtection,
+                                      from = 'No internet service', to = 'No'))
+ChurnData$TechSupport <- as.factor(mapvalues(ChurnData$TechSupport,
+                                      from = 'No internet service', to = 'No'))
+ChurnData$StreamingTV <- as.factor(mapvalues(ChurnData$StreamingTV,
+                                      from = 'No internet service', to = 'No'))
+ChurnData$StreamingMovies <- as.factor(mapvalues(ChurnData$StreamingMovies,
+                                      from = 'No internet service', to = 'No'))
+ChurnData$Churn <- as.factor(mapvalues(ChurnData$Churn,
+                                       from = c('No', 'Yes'), to = c('0', '1')))
+min(ChurnData$tenure); max(ChurnData$tenure)
+ChurnData$tenure_group <- cut(ChurnData$tenure, breaks = c(-1, 6, 12, 18, 24, 30, 
+                                                           36, 42, 48, 54, 60, 66, 72),
+                              labels = c('0 - 6 Mos', '7 - 12 Mos', '13 - 18 Mos', 
+                                         '19 - 24 Mos','25 - 30 Mos', '31 - 36 Mos',
+                                         '37 - 42 Mos', '43 - 48 Mos','49 - 54 Mos', 
+                                         '55 - 60 Mos','61 - 66 Mos', '67 - 72 Mos'))
+ChurnData$customerID <- NULL; ChurnData$tenure <- NULL
+numeric <- sapply(ChurnData, is.numeric)
+CorrTable <- cor(ChurnData[, numeric])
+CorrTable
+ChurnData$MonthlyCharges <- NULL
+
+p1 <- ggplot(ChurnData, aes(x = gender)) + geom_bar(aes( y = 100 * (..count..) /
+        sum(..count..)), width = 0.5) + ggtitle('Gender') + xlab('Gender') + 
+        ylab('Percentage') + coord_flip() + theme_economist()
+p2 <- ggplot(ChurnData, aes(x = SeniorCitizen)) + geom_bar(aes( y = 100 * (..count..) /
+        sum(..count..)), width = 0.5) + ggtitle('Senior Citizen') + 
+        xlab('Senior Citizen') + ylab('Percentage') + coord_flip() + theme_economist() 
+p3 <- ggplot(ChurnData, aes(x = Partner)) + geom_bar(aes( y = 100 * (..count..) /
+        sum(..count..)), width = 0.5) + ggtitle('Partner') + 
+        xlab('Partner') + ylab('Percentage') + coord_flip() + theme_economist()
+p4 <- ggplot(ChurnData, aes(x = Dependents)) + geom_bar(aes( y = 100 * (..count..) /
+        sum(..count..)), width = 0.5) + ggtitle('Dependents') + 
+        xlab('Dependents') + ylab('Percentage') + coord_flip() + theme_economist()
+grid.arrange(p1, p2, p3, p4, ncol = 2)
+
+p5 <- ggplot(ChurnData, aes(x = PhoneService)) + geom_bar(aes( y = 100 * (..count..) /
+        sum(..count..)), width = 0.5) + ggtitle('Phone Service') + xlab('Phone Service') + 
+        ylab('Percentage') + coord_flip() + theme_economist()
+p6 <- ggplot(ChurnData, aes(x = MultipleLines)) + geom_bar(aes( y = 100 * (..count..) /
+        sum(..count..)), width = 0.5) + ggtitle('Multiple Lines') + 
+        xlab('Multiple Lines') + ylab('Percentage') + coord_flip() + theme_economist() 
+p7 <- ggplot(ChurnData, aes(x = InternetService)) + geom_bar(aes( y = 100 * (..count..) /
+        sum(..count..)), width = 0.5) + ggtitle('Internet Service') + 
+        xlab('Internet Service') + ylab('Percentage') + coord_flip() + theme_economist()
+p8 <- ggplot(ChurnData, aes(x = OnlineSecurity)) + geom_bar(aes( y = 100 * (..count..) /
+        sum(..count..)), width = 0.5) + ggtitle('Online Security') + 
+        xlab('Online Security') + ylab('Percentage') + coord_flip() + theme_economist()
+grid.arrange(p5, p6, p7, p8, ncol = 2)
+
+p9 <- ggplot(ChurnData, aes(x = OnlineBackup)) + geom_bar(aes( y = 100 * (..count..) /
+        sum(..count..)), width = 0.5) + ggtitle('Online Backup') + xlab('Online Backup') + 
+        ylab('Percentage') + coord_flip() + theme_economist()
+p10 <- ggplot(ChurnData, aes(x = DeviceProtection)) + geom_bar(aes( y = 100 * (..count..) /
+        sum(..count..)), width = 0.5) + ggtitle('Device Protection') + 
+        xlab('Device Protection') + ylab('Percentage') + coord_flip() + theme_economist() 
+p11 <- ggplot(ChurnData, aes(x = TechSupport)) + geom_bar(aes( y = 100 * (..count..) /
+        sum(..count..)), width = 0.5) + ggtitle('Tech Support') + 
+        xlab('Tech Support') + ylab('Percentage') + coord_flip() + theme_economist()
+p12 <- ggplot(ChurnData, aes(x = StreamingTV)) + geom_bar(aes( y = 100 * (..count..) /
+        sum(..count..)), width = 0.5) + ggtitle('Streaming TV') + 
+        xlab('Streaming TV') + ylab('Percentage') + coord_flip() + theme_economist()
+grid.arrange(p9, p10, p11, p12, ncol = 2)
+
+p13 <- ggplot(ChurnData, aes(x = StreamingMovies)) + geom_bar(aes( y = 100 * (..count..) /
+        sum(..count..)), width = 0.5) + ggtitle('Streaming Movies') + xlab('StreamingMovies') + 
+        ylab('Percentage') + coord_flip() + theme_economist()
+p14 <- ggplot(ChurnData, aes(x = Contract)) + geom_bar(aes( y = 100 * (..count..) /
+        sum(..count..)), width = 0.5) + ggtitle('Contract') + 
+        xlab('Contract') + ylab('Percentage') + coord_flip() + theme_economist() 
+p15 <- ggplot(ChurnData, aes(x = PaperlessBilling)) + geom_bar(aes( y = 100 * (..count..) /
+        sum(..count..)), width = 0.5) + ggtitle('Paperless Billing') + 
+        xlab('Paperless Billing') + ylab('Percentage') + coord_flip() + theme_economist()
+p16 <- ggplot(ChurnData, aes(x = PaymentMethod)) + geom_bar(aes( y = 100 * (..count..) /
+        sum(..count..)), width = 0.5) + ggtitle('Payment Method') + 
+        xlab('Payment Method') + ylab('Percentage') + coord_flip() + theme_economist()
+grid.arrange(p13, p14, p15, p16, ncol = 2)
+
+p17 <- ggplot(ChurnData, aes(x = tenure_group)) + geom_bar(aes( y = 100 * (..count..) /
+                                                                        sum(..count..)), width = 0.5) + ggtitle('Tenure Group') + 
+        xlab('Tenure Group') + ylab('Percentage') + coord_flip() + theme_economist()
+p17
+p18 <- ggplot(ChurnData, aes(x = Churn)) + geom_bar(aes( y = 100 * (..count..) /
+                                                                 sum(..count..)), width = 0.5) + ggtitle('Customer Churn') + 
+        xlab('Churn') + ylab('Percentage') + coord_flip() + theme_economist()
+p18
+ChurnDataDum <- dummy_cols(ChurnData)
+ChurnTenure <- ChurnDataDum[, 19]
+Churn <- ChurnDataDum[, 18]
+ChurnDataDum <- ChurnDataDum[, -c(2:16, 18:22, 25:26, 28, 30, 34:35, 38:39, 41, 
+                                  43, 45, 49, 51, 55:57, 69)]
+
+#Scaling not needod; only one numeric feature. Rest are dummies; don't scale dummies.
+
+ChurnDataDum <- cbind(Churn, ChurnDataDum)
+intrain <- createDataPartition(ChurnDataDum$Churn, p = 0.7, list = FALSE)
+set.seed(2017)
+training <- ChurnDataDum[intrain, ]
+testing <- ChurnDataDum[-intrain, ]
+dim(training); dim(testing)
+LogModel <- glm(Churn ~. , family = binomial(link = 'logit'), data = training)
+LogModel
+summary(LogModel)
+anova(LogModel, test = 'Chisq')
+#LogModel2 <- glm(Churn ~ ., family = binomial(link = 'logit'), data = training)
+LogModel2 <- glm(Churn ~ TotalCharges +
+                         PhoneService_Yes + MultipleLines_Yes + InternetService_DSL + 
+                         `InternetService_Fiber optic` + OnlineSecurity_Yes + 
+                         TechSupport_Yes + StreamingTV_Yes + StreamingMovies_Yes + 
+                         `Contract_Month-to-month` + `Contract_One year` + PaperlessBilling_Yes +
+                         `PaymentMethod_Electronic check` + `tenure_group_0 - 6 Mos`,
+                         family = binomial(link = 'logit'), 
+                         data = training)
+LogModel2
+summary(LogModel2)
+anova(LogModel2, test = 'Chisq')
+glm.fit <- predict.glm(LogModel, newdata = testing, type = 'response')
+glm.fit2 <- predict.glm(LogModel2, newdata = testing, type = 'response')
+glm.fit <- round(glm.fit, 0)
+glm.fit <- as.character(glm.fit)
+glm.fit2 <- round(glm.fit2, 0)
+glm.fit2 <- as.character(glm.fit2)
+
+testing$Churn <- as.character(testing$Churn)
+
+misClassErr <- mean(glm.fit != testing$Churn)
+misClassErr2 <- mean(glm.fit2 != testing$Churn)
+print('Accuracy Rate LogMod'); 1 - misClassErr
+print('Accuracy Rate LogMod2'); 1 - misClassErr2
+
+print("Confusion Matrix for Logistic Regression"); table(testing$Churn, glm.fit > 0.5)
+exp(cbind(OR = coef(LogModel), confint(LogModel)))
+exp(cbind(OR = coef(LogModel2), confint(LogModel2)))
+
+NoChurn <- ifelse(ChurnDataDum$Churn == 0, 'No', 'Yes')
+ChurnDataDum <- data.frame(NoChurn, ChurnDataDum)
+DT.Churn <- tree(NoChurn ~. -Churn, data = ChurnDataDum)
+summary(DT.Churn)
+plot(DT.Churn)
+text(DT.Churn)
+
+set.seed(805)
+ChurnDataDum <- ChurnDataDum[-7043, ]
+DT.train <- sample(1:nrow(ChurnDataDum), 3521)
+DT.test <- ChurnDataDum[-DT.train, ]
+DT.Churn2 <- tree(NoChurn ~ . -Churn, data = ChurnDataDum, subset = DT.train)
+DT.pred <- predict(DT.Churn2, DT.test, type = 'class')
+table(DT.pred, DT.test$NoChurn)
+(2411 + 331) / 3521 #77.9
+
+set.seed(805) 
+cv.Churn <- cv.tree(DT.Churn, FUN = prune.misclass)
+names(cv.Churn)
+cv.Churn
+
+prune.Churn <- prune.misclass(DT.Churn, best = 4)
+plot(prune.Churn); text(prune.Churn)
+prune.pred <- predict(prune.Churn, DT.test, type = 'class')
+table(prune.pred, DT.test$NoChurn)
+(2387 + 364) / 3521 #78.1
+
+set.seed(805)
+rf.Churn <-  randomForest(NoChurn ~ . -Churn, data = ChurnDataDum, subset = DT.train,
+                          mtry = 6, importance = TRUE)
+pred.rf <- predict(rf.Churn, newdata = DT.test)
+table(pred.rf, DT.test$NoChurn)
+(2357 + 415) / 3521 #78.7
+plot(pred.rf, DT.test$NoChurn, main = 'Random Forest Results',
+     xlab = 'Predicted Value', ylab = 'Actual Value')
+importance(rf.Churn)
+varImpPlot(rf.Churn)
+
+
+
