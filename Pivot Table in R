@@ -7,21 +7,12 @@ library(reshape)
 library(data.table)
 library(huxtable)
 
-library(tidyverse)
-library(magrittr)
-library(lubridate)
-library(reshape)
-library(data.table)
-library(huxtable)
-
 FY15 <- read.csv('C:/Users/Steven/Desktop/R Projects/Assessment/Usage FYE15.csv', header = TRUE, na.strings=c("","NA"))
 FY16 <- read.csv('C:/Users/Steven/Desktop/R Projects/Assessment/Usage FYE16.csv', header = TRUE, na.strings=c("","NA"))
 FY17 <- read.csv('C:/Users/Steven/Desktop/R Projects/Assessment/Usage FYE17.csv', header = TRUE, na.strings=c("","NA"))
 Bill <- read.csv('C:/Users/Steven/Desktop/R Projects/Assessment/Billing.csv', header = TRUE, na.strings=c("","NA"))
 
-colnames(FY15)
-colnames(FY16)
-colnames(FY17)
+colnames(FY15); colnames(FY16); colnames(FY17)
 colnames(Bill)
 str(FY15)
 str(FY16)
@@ -57,7 +48,7 @@ FY17W <- FY17W[apply(FY17W[1], 1, function(z) !any(z <= 0)), ]
 
 FY15W$x100 <- FY15W$bill_usage * 100
 FY15W <- FY15W[, -1]
-FY15W <- FY15W %>% select(x100, everything())
+FY15W <- FY15W %>% dplyr::select(x100, everything())
 colnames(FY15W)[1] <- "bill_usage"
 
 FY15W$Date <- dmy(FY15W$tran_date)
@@ -74,11 +65,9 @@ FY15W <- FY15W[, -3]
 FY16W <- FY16W[, -3]
 FY17W <- FY17W[, -3]
 
-colnames(FY15W)
-colnames(FY16W)
-colnames(FY17W)
+colnames(FY15W); colnames(FY16W); colnames(FY17W)
 
-RateAcct <- select(Bill, rate_code, account)
+RateAcct <- dplyr::select(Bill, rate_code, account)
 RateAcct
 
 FY15W <- FY15W %>% left_join(RateAcct, by = 'account')
@@ -102,8 +91,8 @@ sum(sum(is.na(FY15W)), sum(is.na(FY16W)), sum(is.na(FY17W)))
 WaterData <- rbind(FY15W, FY16W)
 WaterData <- rbind(WaterData, FY17W)
 WaterData <- dplyr::rename(WaterData, Usage = bill_usage, Service = service, 
-Account = account, Date = Date, Month = Month, Year = Year, 
-Class = rate_code)
+   Account = account, Date = Date, Month = Month, Year = Year, 
+   Class = rate_code)
 
 WaterData$Class <- as.factor(WaterData$Class)
 str(WaterData)
@@ -119,14 +108,13 @@ max(WaterData$Usage)
 which(WaterData == 999900)
 WaterData <- WaterData[-15937, ]
 
-max(WaterData$Usage)
 summary(WaterData$Usage)
 
 sum(is.na(WaterData))
 table(WaterData$Class) / length(WaterData$Class)
 prop.table(table(WaterData$Class))
 
-WaterTable <- WaterData %>% arrange(Month) %>% group_by(Class) %>% select(-c(Service, Account, Date, Year)) %>% na.omit()
+WaterTable <- WaterData %>% arrange(Month) %>% group_by(Class) %>% dplyr::select(-c(Service, Account, Date, Year)) %>% na.omit()
 
 DataTable<- data.table(WaterTable)
 DataTable
@@ -138,5 +126,8 @@ WaterOut <- spread(WaterResult, Class, V1)
 WaterOut
 
 knitr::kable(WaterOut)
+
+
+
 
 
