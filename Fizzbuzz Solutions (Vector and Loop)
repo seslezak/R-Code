@@ -4,16 +4,16 @@
 #First, by vectorizing
 
 m <- 1:100
-m[which(m%%3 == 0)][which(m%%5 == 0)] <- 'fizzbuzz'
-m[which(as.numeric(m)%%3 == 0)] <- 'fizz'
-m[which(as.numeric(m)%%5 == 0)] <- 'buzz'
+m[which(m %% 3 == 0)][which(m %% 5 == 0)] <- 'fizzbuzz'
+m[which(as.numeric(m) %% 3 == 0)] <- 'fizz'
+m[which(as.numeric(m) %% 5 == 0)] <- 'buzz'
 print(m)
 
 #Second, by looping
 
 for (i in 1:100){
-        if (i%%3==0) if (i%%5==0) print("fizzbuzz") else print("fizz") else
-                if (i%%5==0) print("buzz") else
+        if (i %% 3==0) if (i %% 5==0) print("fizzbuzz") else print("fizz") else
+                if (i %% 5==0) print("buzz") else
                         print(i)
 }
 #Third, with a function using for loops and else if statements
@@ -36,6 +36,19 @@ fizzbuzz <- function(n) {
         
 }
 
+#Fourth, using the dplyr package
+
+x <- 1:100
+dplyr::case_when(
+        x %% 3 == 0 ~ 'fizz',
+        x %% 5 == 0 ~ 'buzz',
+        x %% 15 == 0 ~ 'fizzbuzz',
+        is.na(x) ~ '???',
+        TRUE ~ as.character(x)
+)
+
 #Examples 1 and 2 from librestats
 #http://librestats.com/2012/01/10/honing-your-r-skills-for-job-interviews/
 #Example 3 from UCLA Data Science, Joshua Cook
+#Example 4 from Advanced R by Hadley Wickham, Chapter 5
+#https://adv-r.hadley.nz/control-flow.html
