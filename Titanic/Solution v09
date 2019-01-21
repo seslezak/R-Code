@@ -1,4 +1,4 @@
-#Kaggle Score: 0.81339.  440 of 11213.  Top 3.9%.  96.1%. 
+#Kaggle Score: 0.81339.  656 of 11213.  Top 6.4%.  93.6% as of 21 Jan 19
 
 
 library(rpart)
