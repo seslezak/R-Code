@@ -1,0 +1,61 @@
+#LARUG Linear Algebra and Machine Learning Lightning Talk
+#23 Nov 2019
+
+#Load the Libraries
+
+library(readr)
+library(tidyverse)
+library(GGally)
+library(gridExtra)
+library(scales)
+library(Lahman)
+
+#Run Analysis Using Base R and Output Results
+
+reg1 <- lm(H ~ AB, Batting)
+stargazer::stargazer(reg1, type = 'text')
+
+#Use Linear Algebra to Do the Same
+
+#Create X and Y Matrices
+
+X <- as.matrix(cbind(1, Batting$AB))
+Y <- as.matrix(Batting$H)
+
+#Calculate the Beta Hat
+
+bh <- round(solve(t(X) %*% X) %*% t(X) %*% Y, digits = 3) 
+beta.hat <- as.data.frame(cbind(c('Intercept', 'AB'), bh))
+names(beta.hat) <- c('Coeff', 'Est')
+beta.hat
+
+#Calculate the Residuals
+
+res <- as.matrix(Batting$H - bh[1] - bh[2] * Batting$AB)
+
+#Calculate the Variance-Covariance Matrix
+
+n <- nrow(Batting)
+k <- ncol(X)
+VCV <- 1/(n - k) * as.numeric(t(res) %*% res) * solve(t(X) %*% X)
+
+#Calculate Standard Error and P-Value
+
+StdErr <- sqrt(diag(VCV))
+P.Val <- rbind(2 * pt(abs(bh[1] / StdErr[1]), df = n - k, lower.tail = FALSE), 2 * pt(abs(bh[2] / StdErr[2]), df = n - k, lower.tail = FALSE))
+
+#Combine this With Beta Hat
+
+beta.hat2 <- cbind(beta.hat, StdErr, P.Val)
+beta.hat
+beta.hat2
+
+#Return the Base R Results
+
+stargazer::stargazer(reg1, type = 'text')
+
+#Plot the Regression Line
+
+plot(Batting$AB, Batting$H, xlab = 'AB', ylab = 'H', main = 'Regression by Hand:  Batting AB v H')
+abline(a = bh[1], b = bh[2], col = 'red', lwd = 2, lty = 'dashed')
+
