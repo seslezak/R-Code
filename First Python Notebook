@@ -1,0 +1,103 @@
+library(tidyverse)
+library(psych)
+
+#Load Data from Web
+commlist <- read_csv("https://raw.githubusercontent.com/california-civic-data-coalition/first-python-notebook/master/docs/_static/committees.csv")
+contlist <- read_csv("https://raw.githubusercontent.com/california-civic-data-coalition/first-python-notebook/master/docs/_static/contributions.csv")
+
+#Convert to Tibble Format
+commlist <- as_tibble(commlist)
+contlist <- as_tibble(contlist)
+
+commlist %>% head()
+contlist %>% head()
+
+#Display Proposition Names and Count
+commlist$prop_name
+commlist$prop_name %>% fct_count(sort = TRUE)
+
+#Filter on One Proposition and Create Object
+my_prop <- "PROPOSITION 064- MARIJUANA LEGALIZATION. INITIATIVE STATUTE."
+my_comm <- commlist %>% filter(prop_name == my_prop)
+my_comm %>% head()
+
+#JOIN Tables
+contlist %>% describe()
+commlist %>% describe()
+merged <- my_comm %>% inner_join(contlist, by = "calaccess_committee_id")
+merged %>% head()
+merged %>% describe()
+
+#Summing Amounts
+sum(merged$amount)
+
+#Position Counts and Spending
+merged$committee_position %>% fct_count(sort = TRUE)
+support <- merged %>% filter(committee_position == "SUPPORT")
+oppose <- merged %>% filter(committee_position == "OPPOSE")
+a <- sum(support$amount)
+b <- sum(oppose$amount)
+b / a
+1 - b / a
+
+#Sorting Contributions
+suptable <- support %>% arrange(desc(amount)) %>% view()
+opptable <- oppose %>% arrange(desc(amount)) %>% view()
+
+#Sum Donations by State
+by_state <- merged %>% group_by(contributor_state) %>% summarize(sum(amount)) %>% view()
+
+#Sort by Multiple Factors and Arrange by Donations++
+donors <- merged %>% arrange(contributor_lastname, contributor_firstname, committee_position) %>%
+  arrange(desc(amount)) %>% view()
+supporters <- support %>% arrange(contributor_lastname, contributor_firstname) %>% 
+  filter(committee_position == "SUPPORT") %>% arrange(desc(amount)) %>% view()
+opponents <- oppose %>% arrange(contributor_lastname, contributor_firstname) %>% 
+  filter(committee_position == "OPPOSE") %>% arrange(desc(amount)) %>% view()
+
+#Remove NAs from First Name Columns
+supporters <- support %>% arrange(contributor_lastname, contributor_firstname) %>% 
+  replace_na(list(contributor_firstname = "None")) %>% 
+  filter(committee_position == "SUPPORT") %>% arrange(desc(amount)) %>% view()
+opponents <- oppose %>% arrange(contributor_lastname, contributor_firstname) %>% 
+  replace_na(list(contributor_firstname = "None")) %>% 
+  filter(committee_position == "OPPOSE") %>% arrange(desc(amount)) %>% view()
+
+#Remix this Exercise
+#Remember we created a my_prop object early on?  If you replace the string for
+#Prop 64 with a string for another Prop (say, "PROPOSITION 066- DEATH PENALTY. PROCEDURES. INITIATIVE STATUTE.")
+#You can re-run this whole analysis for the new Proposition! Save this file under
+#a new name before you make the change.
+
+#Charting
+
+options(scipen = 9)
+
+#Create Chart of Top Supporters
+
+top_support <- support %>% select(contributor_firstname, contributor_lastname, amount) %>% 
+  drop_na() %>% group_by(contributor_lastname) %>% 
+  summarize_at(vars(amount), list(amount = sum)) %>% 
+  arrange(desc(amount)) %>% head(10) %>% view()
+
+p <- top_support %>% ggplot(aes(x = amount, y = reorder(contributor_lastname, +amount))) +
+  geom_bar(stat = 'identity', fill = 'blue') 
+p
+p1 <- p + labs(x = "Total Donations", y = "Contributors") +
+  ggtitle('Top Supporter in CA Prop 64 Fight, 2016')
+p1
+
+#Create Chart of Top Contributors by Position
+
+top_conts <- merged %>% select(contributor_firstname, contributor_lastname, committee_position, amount) %>% 
+  drop_na() %>% group_by(contributor_lastname, committee_position) %>% 
+  summarize_at(vars(amount), list(amount = sum)) %>% 
+  arrange(desc(amount)) %>% head(10) %>% view()
+
+p2 <- top_conts %>% ggplot(aes(x = amount, y = reorder(contributor_lastname, +amount), fill = committee_position)) +
+  geom_bar(stat = 'identity')
+p2
+p3 <- p2 + labs(x = "Total Donations", y = "Contributors", fill = "Position") +
+  ggtitle('Top Contributors in CA Prop 64 Fight, 2016')
+p3
+
